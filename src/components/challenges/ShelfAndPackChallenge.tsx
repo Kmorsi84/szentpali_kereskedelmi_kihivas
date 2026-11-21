@@ -216,9 +216,9 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
 
       {/* STEP 2: Dry Goods Weighing */}
       {step === 'weigh' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-5 items-stretch">
           <div className="lg:col-span-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
-            <div className="h-32 sm:h-auto sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+            <div className="h-24 sm:h-auto sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
               {!scaleImgFailed ? (
                 <img
                   src={IMAGES.dryGoodsScale}
@@ -233,10 +233,10 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
                 </div>
               )}
             </div>
-            <div className="p-4 sm:p-5">
+            <div className="p-3.5 sm:p-5">
               <p className="text-xs font-bold text-[#E11D48]">Mérési feladat · Kimért szárazáru</p>
               <h3 className="mt-0.5 text-base sm:text-lg font-bold text-[#0B1220]">
-                Mérj ki pontosan {weighingTask.targetGrams} g {weighingTask.itemName.toLowerCase()}t!
+                Mérj ki pontosan {weighingTask.targetGrams} g {weighingTask.accusativeName}!
               </h3>
               <p className="mt-1 text-xs sm:text-sm text-slate-600">
                 Egységár:{' '}
@@ -248,31 +248,31 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
             </div>
           </div>
 
-          <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4 sm:p-6 flex flex-col justify-between gap-4 sm:gap-5">
+          <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-3.5 sm:p-6 flex flex-col justify-between gap-3.5 sm:gap-5">
             {/* Digital Retail Scale Console */}
-            <div className="rounded-2xl bg-[#0B1220] p-5 text-white border-2 border-[#1E3368]">
+            <div className="rounded-2xl bg-[#0B1220] p-4 sm:p-5 text-white border-2 border-[#1E3368]">
               <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
                 <span>DIGITÁLIS MÉRLEG</span>
                 <span className="tabular-nums text-amber-300">
                   CÉL: {weighingTask.targetGrams} g
                 </span>
               </div>
-              <div className="mt-3 flex items-baseline justify-between gap-4">
+              <div className="mt-2.5 sm:mt-3 flex items-baseline justify-between gap-4">
                 <div>
-                  <span className="font-mono tabular-nums text-4xl sm:text-5xl font-bold tracking-tight text-amber-300">
+                  <span className="font-mono tabular-nums text-3xl sm:text-5xl font-bold tracking-tight text-amber-300">
                     {currentGrams}
                   </span>
-                  <span className="ml-1.5 font-mono text-lg text-slate-300">g</span>
+                  <span className="ml-1.5 font-mono text-base sm:text-lg text-slate-300">g</span>
                 </div>
                 <div className="text-right">
                   <span className="block text-[11px] text-slate-400">Számított ár</span>
-                  <span className="font-mono tabular-nums text-xl font-bold text-white">
+                  <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-white">
                     {formatFt(Math.round((currentGrams / 1000) * weighingTask.unitPricePerKg))}
                   </span>
                 </div>
               </div>
 
-              <div className="mt-4 h-3 w-full rounded-full bg-white/15 overflow-hidden relative">
+              <div className="mt-3 sm:mt-4 h-3 w-full rounded-full bg-white/15 overflow-hidden relative">
                 <div
                   className="h-full bg-amber-400 transition-all duration-150 rounded-full"
                   style={{ width: `${Math.min(100, (currentGrams / 500) * 100)}%` }}
@@ -286,8 +286,8 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
             </div>
 
             {!weighSubmitted ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-4 gap-2.5">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-4 gap-2 sm:gap-2.5">
                   {[
                     { label: '+100 g', delta: 100 },
                     { label: '+50 g', delta: 50 },

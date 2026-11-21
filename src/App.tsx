@@ -270,8 +270,8 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F5F8] text-[#0B1220]">
       {/* Midnight Cobalt Top Bar (Strict 3-Zone Contract) */}
-      <header className="no-print sticky top-0 z-30 h-14 bg-[#0F1D40]/95 backdrop-blur-md border-b border-white/10 text-white">
-        <div className="max-w-6xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-6">
+      <header className="no-print sticky top-0 z-30 h-13 sm:h-14 bg-[#0F1D40]/95 backdrop-blur-md border-b border-white/10 text-white">
+        <div className="max-w-6xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-4 sm:gap-6">
           {/* Zone 1: Brand Wordmark */}
           <button
             type="button"
@@ -281,14 +281,14 @@ export default function App() {
               setActiveChallengeId(null);
               setJustFinished(null);
             }}
-            className="font-display text-base sm:text-lg font-extrabold tracking-tight text-white whitespace-nowrap shrink-0 text-left"
+            className="min-h-[44px] inline-flex items-center font-display text-base sm:text-lg font-extrabold tracking-tight text-white whitespace-nowrap shrink-0 text-left"
           >
             Szentpáli Kihívás
           </button>
 
-          {/* Zone 2: Clean Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-            {player && (
+          {/* Zone 2: Clean Desktop Navigation Links (shown once registered to avoid duplicating right CTA) */}
+          {player && (
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
               <button
                 type="button"
                 onClick={() => {
@@ -296,14 +296,12 @@ export default function App() {
                   setScreen('hub');
                   setActiveChallengeId(null);
                 }}
-                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
+                className={`min-h-[40px] hover:text-white transition-colors whitespace-nowrap shrink-0 ${
                   screen === 'hub' ? 'text-amber-300 font-bold underline underline-offset-4' : ''
                 }`}
               >
                 Állomások
               </button>
-            )}
-            {player && (
               <button
                 type="button"
                 onClick={() => {
@@ -311,7 +309,7 @@ export default function App() {
                   setScreen('certificate');
                   setActiveChallengeId(null);
                 }}
-                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
+                className={`min-h-[40px] hover:text-white transition-colors whitespace-nowrap shrink-0 ${
                   screen === 'certificate'
                     ? 'text-amber-300 font-bold underline underline-offset-4'
                     : ''
@@ -319,23 +317,23 @@ export default function App() {
               >
                 Oklevél
               </button>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                soundEngine.playPop();
-                setScreen('leaderboard');
-                setActiveChallengeId(null);
-              }}
-              className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
-                screen === 'leaderboard'
-                  ? 'text-amber-300 font-bold underline underline-offset-4'
-                  : ''
-              }`}
-            >
-              Toplista
-            </button>
-          </nav>
+              <button
+                type="button"
+                onClick={() => {
+                  soundEngine.playPop();
+                  setScreen('leaderboard');
+                  setActiveChallengeId(null);
+                }}
+                className={`min-h-[40px] hover:text-white transition-colors whitespace-nowrap shrink-0 ${
+                  screen === 'leaderboard'
+                    ? 'text-amber-300 font-bold underline underline-offset-4'
+                    : ''
+                }`}
+              >
+                Toplista
+              </button>
+            </nav>
+          )}
 
           {/* Zone 3: Single Primary Action */}
           <div className="shrink-0">
@@ -544,7 +542,7 @@ export default function App() {
           <div className="space-y-6">
             {/* Midnight Cobalt Player Pass with Progress Ring */}
             <section className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-7 tactile-card">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5">
                 <div className="flex items-center gap-4 min-w-0">
                   {/* SVG Circular Progress Ring */}
                   <div className="relative flex h-16 w-16 items-center justify-center shrink-0">
@@ -583,17 +581,17 @@ export default function App() {
                       {player.name}
                     </h1>
                     <p className="mt-0.5 text-xs sm:text-sm text-slate-300 truncate">
-                      {player.school} <span aria-hidden="true">·</span>{' '}
-                      <strong className="font-bold text-white">{player.className}</strong>
+                      <strong className="font-bold text-white">{player.className}</strong>{' '}
+                      <span aria-hidden="true">·</span> {player.school}
                     </p>
                   </div>
                 </div>
 
                 {/* Right controls & total score */}
-                <div className="flex flex-wrap items-center gap-3 md:justify-end">
-                  <div className="rounded-2xl bg-white/10 px-4 py-2 text-right">
+                <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 lg:justify-end">
+                  <div className="rounded-2xl bg-white/10 px-3.5 sm:px-4 py-2 text-right">
                     <span className="block text-[11px] text-slate-300">Összpontszám</span>
-                    <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-amber-300">
+                    <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-amber-300 whitespace-nowrap">
                       {totalScore} <span className="text-xs font-normal text-slate-300">/ 500</span>
                     </span>
                   </div>
@@ -602,7 +600,7 @@ export default function App() {
                     type="button"
                     onClick={toggleMute}
                     aria-label={muted ? 'Hang bekapcsolása' : 'Hang némítása'}
-                    className="min-h-[44px] min-w-[44px] rounded-xl bg-white/10 text-white hover:bg-white/20 inline-flex items-center justify-center transition-colors"
+                    className="min-h-[44px] min-w-[44px] rounded-xl bg-white/10 text-white hover:bg-white/20 inline-flex items-center justify-center transition-colors shrink-0"
                   >
                     {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
@@ -610,7 +608,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleNewPlayer}
-                    className="min-h-[44px] rounded-xl bg-white/10 px-3.5 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition-colors inline-flex items-center gap-1.5 whitespace-nowrap"
+                    className="min-h-[44px] rounded-xl bg-white/10 px-3.5 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition-colors inline-flex items-center gap-1.5 whitespace-nowrap shrink-0"
                   >
                     <UserPlus className="w-4 h-4" />
                     Új játékos
@@ -655,7 +653,7 @@ export default function App() {
 
             {/* 5 Retail Station Cards */}
             <section className="space-y-3.5">
-              <div className="flex items-baseline justify-between gap-4">
+              <div className="flex items-center justify-between gap-3">
                 <h2 className="text-xl sm:text-2xl font-extrabold text-[#0F1D40]">
                   Kereskedelmi állomások
                 </h2>
@@ -663,7 +661,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
-                    className="text-xs sm:text-sm font-bold text-[#E11D48] hover:underline whitespace-nowrap"
+                    className="min-h-[44px] inline-flex items-center text-xs sm:text-sm font-bold text-[#E11D48] hover:underline whitespace-nowrap shrink-0"
                   >
                     Következő: {nextUncompletedChallenge.shortTitle} →
                   </button>
@@ -671,15 +669,18 @@ export default function App() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {CHALLENGES.map((ch) => {
+                {CHALLENGES.map((ch, idx) => {
                   const res = results[ch.id];
                   const isDone = Boolean(res?.completed);
+                  const isLastOddOnTablet = idx === CHALLENGES.length - 1;
                   return (
                     <button
                       key={ch.id}
                       type="button"
                       onClick={() => handleLaunchChallenge(ch.id)}
-                      className={`group flex flex-col justify-between rounded-3xl border-2 p-5 text-left transition-all active:scale-[0.99] min-h-[184px] tactile-card ${
+                      className={`group flex flex-col justify-between rounded-3xl border-2 p-5 text-left transition-all active:scale-[0.99] min-h-[172px] sm:min-h-[184px] tactile-card ${
+                        isLastOddOnTablet ? 'md:col-span-2 lg:col-span-1' : ''
+                      } ${
                         isDone
                           ? 'border-[#0F1D40] bg-amber-50/45 hover:bg-amber-50/75'
                           : 'border-slate-200 bg-white hover:border-[#0F1D40]'
@@ -745,8 +746,8 @@ export default function App() {
 
         {/* ACTIVE CHALLENGE SCREEN */}
         {screen === 'challenge' && player && activeChallengeMeta && (
-          <div className="space-y-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-3.5 sm:space-y-5">
+            <div className="flex items-center justify-between gap-2.5">
               <button
                 type="button"
                 onClick={() => {
@@ -755,16 +756,19 @@ export default function App() {
                   setActiveChallengeId(null);
                   setJustFinished(null);
                 }}
-                className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2 text-sm font-bold text-[#0F1D40] hover:border-[#0F1D40] transition-colors whitespace-nowrap"
+                className="min-h-[42px] inline-flex items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-3 sm:px-3.5 py-1.5 text-xs sm:text-sm font-bold text-[#0F1D40] hover:border-[#0F1D40] transition-colors whitespace-nowrap shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Állomások
               </button>
 
-              <p className="text-xs sm:text-sm text-slate-600 truncate max-w-full">
+              <p className="text-xs sm:text-sm text-slate-600 truncate min-w-0 text-right">
                 <strong className="font-bold text-[#0F1D40]">{player.name}</strong>{' '}
-                <span aria-hidden="true">·</span> {player.className}{' '}
-                <span aria-hidden="true">·</span> {player.school}
+                <span aria-hidden="true">·</span> {player.className}
+                <span className="hidden sm:inline">
+                  {' '}
+                  <span aria-hidden="true">·</span> {player.school}
+                </span>
               </p>
             </div>
 
@@ -917,7 +921,7 @@ export default function App() {
       {showMobileBottomNav && (
         <nav
           aria-label="Mobil navigáció"
-          className="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0F1D40]/95 backdrop-blur-md border-t border-white/10 pb-safe text-white"
+          className="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0F1D40]/95 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)] text-white"
         >
           <div className="grid grid-cols-3 h-14 items-center">
             <button

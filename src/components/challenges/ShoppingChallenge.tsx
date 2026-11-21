@@ -298,8 +298,8 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
         )}
       </div>
 
-      {/* Product shelf grid with supermarket yellow price stickers */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
+      {/* Product shelf grid with supermarket yellow price stickers (2x5 on mobile, 5x2 on tablet/desktop) */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2.5 sm:gap-3">
         {SHOP_PRODUCTS.map((product) => {
           const isSelected = selectedIds.includes(product.id);
           const cantAfford = !isSelected && totalSpent + product.price > SHOPPING_BUDGET;
@@ -308,7 +308,7 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
               key={product.id}
               type="button"
               onClick={() => toggleProduct(product)}
-              className={`group relative flex flex-col justify-between rounded-2xl border-2 p-3 sm:p-3.5 text-left transition-all active:scale-[0.98] min-h-[146px] sm:min-h-[164px] ${
+              className={`group relative flex flex-col justify-between rounded-2xl border-2 p-2.5 lg:p-3.5 text-left transition-all active:scale-[0.98] min-h-[144px] lg:min-h-[164px] ${
                 isSelected
                   ? 'border-[#0F1D40] bg-[#EEF2FF]/70 shadow-[0_3px_0_0_#0F1D40]'
                   : cantAfford

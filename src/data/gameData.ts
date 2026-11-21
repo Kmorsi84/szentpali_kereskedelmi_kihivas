@@ -298,6 +298,7 @@ export const SHELF_ITEMS: ShelfItem[] = [
 export interface WeighingTask {
   id: string;
   itemName: string;
+  accusativeName: string;
   art: ProductArtId;
   targetGrams: number;
   toleranceGrams: number;
@@ -308,6 +309,7 @@ export const WEIGHING_TASKS: WeighingTask[] = [
   {
     id: 'w-pasta',
     itemName: 'Száraztészta (orsótészta)',
+    accusativeName: 'száraztésztát',
     art: 'pasta',
     targetGrams: 250,
     toleranceGrams: 15,
@@ -316,6 +318,7 @@ export const WEIGHING_TASKS: WeighingTask[] = [
   {
     id: 'w-beans',
     itemName: 'Vörösbab',
+    accusativeName: 'vörösbabot',
     art: 'beans',
     targetGrams: 300,
     toleranceGrams: 15,
@@ -324,6 +327,7 @@ export const WEIGHING_TASKS: WeighingTask[] = [
   {
     id: 'w-peas',
     itemName: 'Sárgaborsó',
+    accusativeName: 'sárgaborsót',
     art: 'peas',
     targetGrams: 200,
     toleranceGrams: 15,

@@ -123,10 +123,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
       </div>
 
       {/* Main layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
         {/* Mystery Box Stage */}
         <div className="lg:col-span-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
-          <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+          <div className="relative h-36 sm:h-auto sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
             {!imageFailed ? (
               <img
                 src={IMAGES.mysteryBox}
@@ -142,12 +142,12 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0F1D40]/90 via-[#0F1D40]/20 to-transparent" />
-            <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
+            <div className="absolute bottom-2.5 sm:bottom-3 left-4 right-4 flex items-end justify-between text-white">
               <div>
                 <p className="text-xs text-amber-300 font-medium">
                   Vajon felismered, mit vásárolnál?
                 </p>
-                <p className="text-lg font-bold">
+                <p className="text-base sm:text-lg font-bold">
                   {isAnswered ? currentItem.name : 'Nyúlj be képzeletben a dobozba'}
                 </p>
               </div>
@@ -159,7 +159,7 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
             </div>
           </div>
 
-          <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+          <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-3 sm:gap-4">
             {mode === 'booth' ? (
               <div className="space-y-2">
                 <p className="text-sm font-bold text-[#0F1D40]">

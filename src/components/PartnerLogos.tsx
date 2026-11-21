@@ -52,7 +52,7 @@ export const PartnerLogos: React.FC<PartnerLogosProps> = ({ compact = false }) =
             title={partner.name}
             className={
               compact
-                ? 'flex items-center justify-center rounded-xl bg-white border border-slate-200 px-3 py-1.5 h-11 min-w-[84px]'
+                ? 'flex items-center justify-center rounded-xl bg-white border border-slate-200 px-2.5 py-1.5 h-12 min-w-[96px]'
                 : 'flex items-center justify-center rounded-2xl bg-white border border-slate-200 px-3 py-2.5 h-16'
             }
           >
@@ -69,8 +69,8 @@ export const PartnerLogos: React.FC<PartnerLogosProps> = ({ compact = false }) =
                 }
                 className={
                   compact
-                    ? 'max-h-7 max-w-[92px] w-auto object-contain'
-                    : 'max-h-10 max-w-full w-auto object-contain'
+                    ? 'max-h-8 max-w-[104px] w-auto object-contain'
+                    : 'max-h-11 max-w-full w-auto object-contain'
                 }
               />
             ) : (

@@ -317,7 +317,11 @@ export const CertificateView: React.FC<CertificateViewProps> = ({
             </p>
 
             {/* Completed stations breakdown */}
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left max-w-2xl mx-auto">
+            <div
+              className={`mt-6 grid grid-cols-1 gap-2.5 text-left mx-auto ${
+                completedList.length === 1 ? 'max-w-sm' : 'sm:grid-cols-2 max-w-2xl'
+              }`}
+            >
               {completedList.map((ch) => {
                 const res = results[ch.id];
                 return (
