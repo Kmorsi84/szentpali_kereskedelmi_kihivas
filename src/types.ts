@@ -42,5 +42,5 @@ export interface ChallengeMeta {
   subtitle: string;
   durationLabel: string;
   maxScore: number;
-  partnerTag: 'Tesco' | 'Interspar' | 'Coop';
+  partnerTag: 'Auchan' | 'METRO' | 'Interspar' | 'Unió Coop';
 }

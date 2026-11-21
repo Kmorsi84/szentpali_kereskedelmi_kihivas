@@ -42,25 +42,26 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5">
+      {/* Midnight Cobalt Header */}
+      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-slate-500">
-              5. állomás · {index + 1} / {PRODUCE_QUIZ_ITEMS.length}. kép · Interspar Partnerfeladat
+            <p className="text-xs text-amber-300 font-medium">
+              05. állomás · {index + 1} / {PRODUCE_QUIZ_ITEMS.length}. kép · Interspar Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-lg sm:text-xl font-bold text-slate-900">
+            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
               Milyen gyümölcsöt, zöldséget látsz a képen?
             </h2>
           </div>
-          <span className="font-mono tabular-nums text-sm font-bold text-emerald-700 shrink-0">
+          <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-[#0F1D40] bg-[#FDE047] px-2.5 py-1 rounded-lg shrink-0">
             {current.pluCode}
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        {/* High-res studio produce photo */}
-        <div className="lg:col-span-6 rounded-2xl bg-white border border-slate-200 overflow-hidden flex flex-col">
+        {/* Studio Produce Photo */}
+        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
           <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden">
             {!brokenImages[current.id] ? (
               <img
@@ -76,22 +77,24 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-emerald-50 text-emerald-800 p-6">
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F1D40] text-amber-300 p-6">
                 <Leaf className="w-10 h-10 mb-2" />
-                <span className="text-sm font-semibold">Zöldség-Gyümölcs pult</span>
+                <span className="text-sm font-bold">Zöldség-Gyümölcs pult</span>
               </div>
             )}
           </div>
-          <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <div className="px-5 py-3.5 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500">
             <span>Kassza mérleg azonosítás</span>
-            <span className="font-mono tabular-nums">{current.pluCode}</span>
+            <span className="font-mono tabular-nums font-bold text-[#0F1D40]">
+              {current.pluCode}
+            </span>
           </div>
         </div>
 
-        {/* 4 Choices + Retail Freshness Tip */}
-        <div className="lg:col-span-6 rounded-2xl bg-white border border-slate-200 p-5 flex flex-col justify-between gap-4">
+        {/* 4 Choices + Tip */}
+        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card p-5 sm:p-6 flex flex-col justify-between gap-4">
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-slate-900">
+            <p className="text-sm font-bold text-[#0F1D40]">
               Válaszd ki a helyes megnevezést a mérleghez:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -99,12 +102,12 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
                 const isSelected = selected === opt;
                 const isRight = opt === current.correctName;
                 let cls =
-                  'border-slate-200 bg-white text-slate-900 hover:border-emerald-600 hover:bg-emerald-50/30';
+                  'border-slate-200 bg-[#F4F5F8] text-[#0B1220] hover:border-[#0F1D40] hover:bg-amber-50';
                 if (isAnswered) {
                   if (isRight) {
-                    cls = 'border-emerald-600 bg-emerald-50 text-emerald-950 ring-1 ring-emerald-600';
+                    cls = 'border-[#0F1D40] bg-amber-100 text-[#0F1D40] ring-2 ring-amber-400';
                   } else if (isSelected && !isRight) {
-                    cls = 'border-red-500 bg-red-50 text-red-950';
+                    cls = 'border-rose-500 bg-rose-50 text-rose-950';
                   } else {
                     cls = 'border-slate-200 bg-slate-50 text-slate-400 opacity-65';
                   }
@@ -116,7 +119,7 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
                     type="button"
                     disabled={isAnswered}
                     onClick={() => handleChoose(opt)}
-                    className={`min-h-[56px] rounded-xl border px-4 py-3 text-left text-base font-semibold transition-all active:scale-[0.98] ${cls}`}
+                    className={`min-h-[60px] rounded-2xl border-2 px-4 py-3 text-left text-base font-bold transition-all active:scale-[0.98] ${cls}`}
                   >
                     {opt}
                   </button>
@@ -127,20 +130,20 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
 
           {isAnswered && (
             <div
-              className={`rounded-xl border p-4 space-y-3 ${
+              className={`rounded-2xl border-2 p-4 space-y-3 ${
                 isCorrect
-                  ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950'
-                  : 'bg-amber-50/80 border-amber-200 text-amber-950'
+                  ? 'bg-amber-50 border-amber-300 text-[#0F1D40]'
+                  : 'bg-rose-50 border-rose-200 text-rose-950'
               }`}
             >
               <div className="flex items-start gap-2.5 text-sm">
                 {isCorrect ? (
-                  <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#0F1D40] shrink-0 mt-0.5" />
                 ) : (
-                  <XCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                  <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-bold">
                     {isCorrect
                       ? `Helyes! Ez ${current.correctName.toLowerCase()}.`
                       : `A képen látható áru: ${current.correctName}.`}
@@ -154,7 +157,7 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
               <button
                 type="button"
                 onClick={handleNext}
-                className="w-full min-h-[48px] rounded-xl bg-emerald-700 px-5 text-sm font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2"
+                className="tactile-btn w-full min-h-[50px] rounded-2xl bg-[#E11D48] px-5 text-sm font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2"
               >
                 {index + 1 < PRODUCE_QUIZ_ITEMS.length ? 'Következő kép' : 'Kvíz lezárása'}
                 <ArrowRight className="w-4 h-4" />

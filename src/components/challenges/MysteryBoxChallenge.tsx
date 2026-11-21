@@ -49,7 +49,6 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
     const isCorrect = itemId === currentItem.id;
     if (isCorrect) {
       soundEngine.playCorrect();
-      // Reward fewer clues needed: 1 clue = 34 pts, 2 clues = 30 pts, 3 clues = 26 pts (max ~100 across 3 rounds)
       const roundPts = mode === 'booth' ? 34 : revealedClues === 1 ? 34 : revealedClues === 2 ? 30 : 27;
       setScore((prev) => Math.min(100, prev + roundPts));
       setCorrectCount((prev) => prev + 1);
@@ -75,19 +74,19 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
 
   return (
     <div className="space-y-5">
-      {/* Header + Mode Switch */}
-      <div className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5">
+      {/* Midnight Cobalt Header + Mode Switch */}
+      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-slate-500">
-              2. állomás · {roundIndex + 1} / {rounds.length}. kör · Coop Partnerfeladat
+            <p className="text-xs text-amber-300 font-medium">
+              02. állomás · {roundIndex + 1} / {rounds.length}. kör · Unió Coop Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-lg sm:text-xl font-bold text-slate-900">
+            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
               Felismered, mit rejt a titkos doboz?
             </h2>
           </div>
           <div
-            className="inline-flex items-center gap-1 rounded-xl bg-slate-100 p-1 self-start sm:self-auto"
+            className="inline-flex items-center gap-1 rounded-xl bg-white/10 p-1 self-start sm:self-auto"
             role="group"
             aria-label="Játékmód"
           >
@@ -97,10 +96,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 soundEngine.playPop();
                 setMode('digital');
               }}
-              className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
+              className={`min-h-[38px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
                 mode === 'digital'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-amber-400 text-[#0F1D40]'
+                  : 'text-slate-200 hover:text-white'
               }`}
             >
               Telefonos tapintás
@@ -111,10 +110,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 soundEngine.playPop();
                 setMode('booth');
               }}
-              className={`min-h-[38px] px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
+              className={`min-h-[38px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
                 mode === 'booth'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-amber-400 text-[#0F1D40]'
+                  : 'text-slate-200 hover:text-white'
               }`}
             >
               Stand valódi doboza
@@ -123,10 +122,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
         </div>
       </div>
 
-      {/* Main layout: Mystery box visual + clues on left, answer options on right on desktop */}
+      {/* Main layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Mystery Box Stage */}
-        <div className="lg:col-span-6 rounded-2xl bg-white border border-slate-200 overflow-hidden flex flex-col">
+        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
           <div className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
             {!imageFailed ? (
               <img
@@ -137,52 +136,54 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-500 p-6">
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[#0F1D40] text-amber-300 p-6">
                 <Hand className="w-10 h-10 mb-2" />
-                <span className="text-sm font-medium">Titkos doboz</span>
+                <span className="text-sm font-bold">Titkos doboz</span>
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0F1D40]/90 via-[#0F1D40]/20 to-transparent" />
             <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
               <div>
-                <p className="text-xs text-slate-200">Vajon felismered, mit vásárolnál?</p>
-                <p className="text-base font-bold">
+                <p className="text-xs text-amber-300 font-medium">
+                  Vajon felismered, mit vásárolnál?
+                </p>
+                <p className="text-lg font-bold">
                   {isAnswered ? currentItem.name : 'Nyúlj be képzeletben a dobozba'}
                 </p>
               </div>
               {isAnswered && (
-                <div className="rounded-xl bg-white/95 p-1.5 shadow-sm">
+                <div className="rounded-2xl bg-white p-2 shadow-md">
                   <ProductArtwork art={currentItem.art} className="w-11 h-11" />
                 </div>
               )}
             </div>
           </div>
 
-          <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between gap-4">
+          <div className="p-5 flex-1 flex flex-col justify-between gap-4">
             {mode === 'booth' ? (
               <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-sm font-bold text-[#0F1D40]">
                   Valódi doboz mód a kiállítási standon
                 </p>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Dugj be egy kezet a standon lévő titkos dobozba, tapogasd meg alaposan a terméket,
-                  majd válaszd ki a jobb oldali kártyák közül, mit érzel! Ha segítség kell, nézd meg az első nyomot:
+                  majd válaszd ki a kártyák közül, mit érzel!
                 </p>
-                <p className="text-sm text-emerald-800 font-medium pt-1">
-                  Tipp: {currentItem.clues[0]}
+                <p className="text-sm text-[#0F1D40] font-semibold bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  Segítő nyom: {currentItem.clues[0]}
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-600">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-[#0F1D40]">
                     Tapintási nyomok ({revealedClues} / 3)
                   </span>
                   {revealedClues < 3 && !isAnswered && (
                     <button
                       type="button"
                       onClick={handleRevealMore}
-                      className="min-h-[36px] inline-flex items-center gap-1.5 rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-semibold text-amber-900 hover:bg-amber-200 transition-colors whitespace-nowrap"
+                      className="min-h-[38px] inline-flex items-center gap-1.5 rounded-xl bg-[#FDE047] px-3 py-1.5 text-xs font-bold text-[#0F1D40] hover:bg-amber-300 transition-colors whitespace-nowrap"
                     >
                       <Hand className="w-3.5 h-3.5" />
                       Még jobban megtapintom
@@ -194,7 +195,7 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                   {currentItem.clues.slice(0, revealedClues).map((clue, idx) => (
                     <li
                       key={idx}
-                      className="rounded-xl bg-slate-50 border border-slate-200/80 px-3.5 py-2.5 leading-relaxed"
+                      className="rounded-2xl bg-[#F4F5F8] border border-slate-200/80 px-3.5 py-2.5 leading-relaxed"
                     >
                       {clue}
                     </li>
@@ -205,10 +206,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
           </div>
         </div>
 
-        {/* Right: 4 tactile item choices + feedback */}
+        {/* Right: 4 Choice Cards */}
         <div className="lg:col-span-6 flex flex-col justify-between gap-4">
-          <div className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 flex-1 flex flex-col">
-            <p className="text-sm font-semibold text-slate-900">
+          <div className="rounded-3xl bg-white border border-slate-200 tactile-card p-5 flex-1 flex flex-col">
+            <p className="text-sm font-bold text-[#0F1D40]">
               Melyik bolti termék van a dobozban?
             </p>
             <div className="mt-3 grid grid-cols-2 gap-3 flex-1">
@@ -216,14 +217,15 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 const chosen = selectedGuess === opt.id;
                 const rightOption = opt.id === currentItem.id;
                 let styleClass =
-                  'border-slate-200 bg-white hover:border-emerald-600 hover:bg-emerald-50/30 text-slate-900';
+                  'border-slate-200 bg-white hover:border-[#0F1D40] hover:bg-indigo-50/40 text-[#0B1220]';
                 if (isAnswered) {
                   if (rightOption) {
-                    styleClass = 'border-emerald-600 bg-emerald-50 text-emerald-950 ring-1 ring-emerald-600';
+                    styleClass =
+                      'border-[#0F1D40] bg-amber-50 text-[#0F1D40] ring-2 ring-amber-400';
                   } else if (chosen && !rightOption) {
-                    styleClass = 'border-red-500 bg-red-50 text-red-950';
+                    styleClass = 'border-rose-500 bg-rose-50 text-rose-950';
                   } else {
-                    styleClass = 'border-slate-200 bg-slate-50/70 opacity-55 text-slate-600';
+                    styleClass = 'border-slate-200 bg-slate-50 opacity-55 text-slate-500';
                   }
                 }
 
@@ -233,10 +235,10 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                     type="button"
                     disabled={isAnswered}
                     onClick={() => handleGuess(opt.id)}
-                    className={`flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 transition-all active:scale-[0.98] min-h-[124px] ${styleClass}`}
+                    className={`flex flex-col items-center justify-center gap-2.5 rounded-2xl border-2 p-4 transition-all active:scale-[0.98] min-h-[128px] ${styleClass}`}
                   >
                     <ProductArtwork art={opt.art} className="w-14 h-14" />
-                    <span className="text-sm font-semibold text-center">{opt.name}</span>
+                    <span className="text-sm font-bold text-center">{opt.name}</span>
                   </button>
                 );
               })}
@@ -244,20 +246,20 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
 
             {isAnswered && (
               <div
-                className={`mt-4 rounded-xl border p-4 ${
+                className={`mt-4 rounded-2xl border-2 p-4 ${
                   isCorrect
-                    ? 'bg-emerald-50/80 border-emerald-200 text-emerald-950'
-                    : 'bg-amber-50/80 border-amber-200 text-amber-950'
+                    ? 'bg-amber-50/90 border-amber-300 text-[#0F1D40]'
+                    : 'bg-rose-50/90 border-rose-200 text-rose-950'
                 }`}
               >
                 <div className="flex items-start gap-2.5">
                   {isCorrect ? (
-                    <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-5 h-5 text-[#0F1D40] shrink-0 mt-0.5" />
                   ) : (
-                    <XCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+                    <XCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
                   )}
                   <div className="text-sm">
-                    <p className="font-semibold">
+                    <p className="font-bold">
                       {isCorrect
                         ? `Telitalálat! Ez bizony ${currentItem.name.toLowerCase()}.`
                         : `A helyes válasz: ${currentItem.name}.`}
@@ -271,7 +273,7 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="mt-4 w-full min-h-[48px] rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2"
+                  className="tactile-btn mt-4 w-full min-h-[50px] rounded-2xl bg-[#E11D48] px-5 py-3 text-sm font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2"
                 >
                   {roundIndex + 1 < rounds.length ? 'Következő titkos termék' : 'Állomás befejezése'}
                   <ArrowRight className="w-4 h-4" />

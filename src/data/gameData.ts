@@ -25,7 +25,7 @@ export const CHALLENGES: ChallengeMeta[] = [
     subtitle: 'Válassz okosan az árcédulák alapján, és maradj 3 000 Ft alatt!',
     durationLabel: '~45 mp',
     maxScore: 100,
-    partnerTag: 'Tesco',
+    partnerTag: 'Auchan',
   },
   {
     id: 'mystery',
@@ -35,7 +35,7 @@ export const CHALLENGES: ChallengeMeta[] = [
     subtitle: 'Tapintás és érzékszervi nyomok alapján találd ki, mi rejtőzik benne!',
     durationLabel: '~40 mp',
     maxScore: 100,
-    partnerTag: 'Coop',
+    partnerTag: 'Unió Coop',
   },
   {
     id: 'shelf',
@@ -55,7 +55,7 @@ export const CHALLENGES: ChallengeMeta[] = [
     subtitle: 'Számolj tömegárat, visszajárót 5 000 Ft-ból és 20%-os akciót!',
     durationLabel: '~45 mp',
     maxScore: 100,
-    partnerTag: 'Tesco',
+    partnerTag: 'METRO',
   },
   {
     id: 'produce',

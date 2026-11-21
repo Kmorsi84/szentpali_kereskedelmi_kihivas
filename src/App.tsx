@@ -10,7 +10,6 @@ import {
   Play,
   Store,
   Trophy,
-  UserCheck,
   UserPlus,
   Volume2,
   VolumeX,
@@ -38,6 +37,11 @@ import { ProduceQuizChallenge } from './components/challenges/ProduceQuizChallen
 import { CertificateView } from './components/CertificateView';
 import { LeaderboardView } from './components/LeaderboardView';
 import { soundEngine } from './utils/sound';
+import {
+  fetchExpoLeaderboardFromSupabase,
+  isSupabaseConfigured,
+  saveExpoResultToSupabase,
+} from './lib/supabase';
 
 const STORAGE_KEYS = {
   player: 'szentpali_expo_player_v1',
@@ -77,8 +81,8 @@ export default function App() {
   } | null>(null);
   const [muted, setMuted] = useState(false);
   const [heroImgFailed, setHeroImgFailed] = useState(false);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
 
-  // Registration form fields
   const [nameInput, setNameInput] = useState('');
   const [classInput, setClassInput] = useState('');
   const [schoolInput, setSchoolInput] = useState('');
@@ -111,6 +115,22 @@ export default function App() {
       // Ignore storage quota errors
     }
   }, [leaderboard]);
+
+  const refreshCloudLeaderboard = async () => {
+    if (!isSupabaseConfigured) return;
+    setIsLoadingLeaderboard(true);
+    const remoteEntries = await fetchExpoLeaderboardFromSupabase();
+    if (remoteEntries) {
+      setLeaderboard(remoteEntries);
+    }
+    setIsLoadingLeaderboard(false);
+  };
+
+  useEffect(() => {
+    if (screen === 'leaderboard' && isSupabaseConfigured) {
+      void refreshCloudLeaderboard();
+    }
+  }, [screen]);
 
   const completedCount = useMemo(
     () => CHALLENGES.filter((c) => results[c.id]?.completed).length,
@@ -209,19 +229,28 @@ export default function App() {
         0
       );
 
+      const entry: LeaderboardEntry = {
+        id: player.id,
+        name: player.name,
+        className: player.className,
+        school: player.school,
+        totalScore: nextTotalScore,
+        completedCount: nextCompletedCount,
+        updatedAt: new Date().toISOString(),
+      };
+
       setLeaderboard((prev) => {
-        const entry: LeaderboardEntry = {
-          id: player.id,
-          name: player.name,
-          className: player.className,
-          school: player.school,
-          totalScore: nextTotalScore,
-          completedCount: nextCompletedCount,
-          updatedAt: new Date().toISOString(),
-        };
         const exists = prev.some((item) => item.id === player.id);
         return exists ? prev.map((item) => (item.id === player.id ? entry : item)) : [entry, ...prev];
       });
+
+      if (isSupabaseConfigured) {
+        void saveExpoResultToSupabase(entry, updatedResults).then((saved) => {
+          if (saved) {
+            void refreshCloudLeaderboard();
+          }
+        });
+      }
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -233,12 +262,17 @@ export default function App() {
 
   const showMobileBottomNav = Boolean(player) && screen !== 'challenge' && screen !== 'welcome';
 
+  // Circular SVG progress ring math for the Cobalt Expo Pass
+  const ringRadius = 26;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = ringCircumference * (1 - completedCount / CHALLENGES.length);
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F7F9] text-slate-900">
-      {/* Top Bar (Strict 3-Zone Contract: Brand — Concise Nav — Single Primary Action) */}
-      <header className="no-print sticky top-0 z-30 h-14 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <div className="min-h-screen flex flex-col bg-[#F4F5F8] text-[#0B1220]">
+      {/* Midnight Cobalt Top Bar (Strict 3-Zone Contract) */}
+      <header className="no-print sticky top-0 z-30 h-14 bg-[#0F1D40]/95 backdrop-blur-md border-b border-white/10 text-white">
         <div className="max-w-6xl mx-auto h-full px-4 sm:px-6 flex items-center justify-between gap-6">
-          {/* Zone 1: Single-line brand wordmark */}
+          {/* Zone 1: Brand Wordmark */}
           <button
             type="button"
             onClick={() => {
@@ -247,13 +281,13 @@ export default function App() {
               setActiveChallengeId(null);
               setJustFinished(null);
             }}
-            className="font-display text-base sm:text-lg font-bold tracking-tight text-emerald-900 whitespace-nowrap shrink-0 text-left"
+            className="font-display text-base sm:text-lg font-extrabold tracking-tight text-white whitespace-nowrap shrink-0 text-left"
           >
             Szentpáli Kihívás
           </button>
 
-          {/* Zone 2: Concise single-line desktop nav links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+          {/* Zone 2: Clean Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
             {player && (
               <button
                 type="button"
@@ -262,8 +296,8 @@ export default function App() {
                   setScreen('hub');
                   setActiveChallengeId(null);
                 }}
-                className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 ${
-                  screen === 'hub' ? 'text-emerald-800 font-semibold underline underline-offset-4' : ''
+                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
+                  screen === 'hub' ? 'text-amber-300 font-bold underline underline-offset-4' : ''
                 }`}
               >
                 Állomások
@@ -277,9 +311,9 @@ export default function App() {
                   setScreen('certificate');
                   setActiveChallengeId(null);
                 }}
-                className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 ${
+                className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
                   screen === 'certificate'
-                    ? 'text-emerald-800 font-semibold underline underline-offset-4'
+                    ? 'text-amber-300 font-bold underline underline-offset-4'
                     : ''
                 }`}
               >
@@ -293,9 +327,9 @@ export default function App() {
                 setScreen('leaderboard');
                 setActiveChallengeId(null);
               }}
-              className={`hover:text-slate-900 transition-colors whitespace-nowrap shrink-0 ${
+              className={`hover:text-white transition-colors whitespace-nowrap shrink-0 ${
                 screen === 'leaderboard'
-                  ? 'text-emerald-800 font-semibold underline underline-offset-4'
+                  ? 'text-amber-300 font-bold underline underline-offset-4'
                   : ''
               }`}
             >
@@ -303,7 +337,7 @@ export default function App() {
             </button>
           </nav>
 
-          {/* Zone 3: Single contextual primary action */}
+          {/* Zone 3: Single Primary Action */}
           <div className="shrink-0">
             {player ? (
               <button
@@ -313,7 +347,7 @@ export default function App() {
                   setScreen('certificate');
                   setActiveChallengeId(null);
                 }}
-                className="min-h-[38px] rounded-lg bg-emerald-700 px-3.5 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-emerald-800 transition-colors whitespace-nowrap shrink-0"
+                className="min-h-[38px] rounded-xl bg-amber-400 px-3.5 py-2 text-xs sm:text-sm font-bold text-[#0F1D40] hover:bg-amber-300 transition-colors whitespace-nowrap shrink-0"
               >
                 {completedCount >= 1 ? 'Oklevél megnyitása' : `Haladás: ${completedCount}/5`}
               </button>
@@ -324,7 +358,7 @@ export default function App() {
                   soundEngine.playPop();
                   setScreen(screen === 'leaderboard' ? 'welcome' : 'leaderboard');
                 }}
-                className="min-h-[38px] rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors whitespace-nowrap shrink-0"
+                className="min-h-[38px] rounded-xl bg-white/10 px-3.5 py-2 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition-colors whitespace-nowrap shrink-0"
               >
                 {screen === 'leaderboard' ? 'Regisztráció' : 'Toplista'}
               </button>
@@ -341,159 +375,154 @@ export default function App() {
       >
         {/* WELCOME / REGISTRATION SCREEN */}
         {screen === 'welcome' && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-              {/* Left: Intro + Fast Expo Registration Form */}
-              <div className="lg:col-span-6 flex flex-col justify-between gap-6">
-                <div>
-                  <p className="text-xs sm:text-sm font-semibold text-emerald-800">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              {/* Left: Bold Midnight Cobalt Editorial Poster + Retail Photo */}
+              <div className="lg:col-span-7 rounded-3xl bg-[#0F1D40] text-white overflow-hidden tactile-card flex flex-col justify-between">
+                <div className="p-6 sm:p-8 space-y-3">
+                  <p className="text-xs sm:text-sm font-bold text-amber-300">
                     {SCHOOL_FULL_NAME}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    {PROGRAM_NAME} szak · Pályaválasztási kiállítás
+                  <p className="text-xs text-slate-300">
+                    {PROGRAM_NAME} szak · Pályaválasztási kiállítás · 2–3 perc játékidő
                   </p>
-                  <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-[1.12]">
+                  <h1 className="pt-1 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.08]">
                     Mérj, csomagolj és számolj!
                   </h1>
-                  <p className="mt-3 text-base text-slate-600 leading-relaxed max-w-xl">
-                    Légy te a kereskedelmi értékesítő néhány perc alatt! Teljesíts legalább 1
-                    kihívást az 5 állomás közül, és szerezz matricát, cukorkát vagy névre szóló{' '}
-                    <strong className="font-semibold text-slate-900">„Kis kereskedő” oklevelet</strong>.
+                  <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-xl">
+                    Légy te a kereskedelmi értékesítő! Teljesíts legalább 1 villámkihívást az 5
+                    állomás közül, és szerezz matricát, cukorkát vagy névre szóló{' '}
+                    <strong className="font-bold text-amber-300">„Kis kereskedő” oklevelet</strong>.
                   </p>
                 </div>
 
-                {/* Registration Form */}
-                <form
-                  onSubmit={handleStartSession}
-                  className="rounded-2xl bg-white border border-slate-200 p-5 sm:p-6 space-y-4"
-                >
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900">
-                      Add meg az adataidat az oklevélhez
-                    </h2>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      A neved, osztályod és iskolád megjelenik a játékban és az okleveleden is.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label
-                        htmlFor="player-name"
-                        className="block text-xs font-semibold text-slate-700 mb-1"
-                      >
-                        Teljes neved
-                      </label>
-                      <input
-                        id="player-name"
-                        type="text"
-                        required
-                        value={nameInput}
-                        onChange={(e) => {
-                          setNameInput(e.target.value);
-                          setFormError(null);
-                        }}
-                        placeholder="pl. Kovács Bence"
-                        className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                      <div className="sm:col-span-4">
-                        <label
-                          htmlFor="player-class"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
-                        >
-                          Osztályod
-                        </label>
-                        <input
-                          id="player-class"
-                          type="text"
-                          required
-                          value={classInput}
-                          onChange={(e) => {
-                            setClassInput(e.target.value);
-                            setFormError(null);
-                          }}
-                          placeholder="pl. 8.a"
-                          className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
-                        />
-                      </div>
-
-                      <div className="sm:col-span-8">
-                        <label
-                          htmlFor="player-school"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
-                        >
-                          Iskolád neve
-                        </label>
-                        <input
-                          id="player-school"
-                          type="text"
-                          required
-                          value={schoolInput}
-                          onChange={(e) => {
-                            setSchoolInput(e.target.value);
-                            setFormError(null);
-                          }}
-                          placeholder="pl. Miskolci Kazinczy Általános Iskola"
-                          className="w-full min-h-[46px] rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-700/15"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {formError && (
-                    <p role="alert" className="text-xs font-semibold text-red-700">
-                      {formError}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="w-full min-h-[52px] rounded-xl bg-emerald-700 px-5 py-3.5 text-base font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2"
-                  >
-                    <Play className="w-4 h-4 fill-current" />
-                    Kihívás indítása
-                  </button>
-                </form>
-              </div>
-
-              {/* Right: Editorial Retail Hero Photo + Partners */}
-              <div className="lg:col-span-6 flex flex-col gap-4">
-                <div className="relative flex-1 min-h-[240px] rounded-2xl overflow-hidden bg-slate-200 border border-slate-200">
+                <div className="relative h-52 sm:h-64 w-full bg-[#162A5C] overflow-hidden mt-2">
                   {!heroImgFailed ? (
                     <img
                       src={IMAGES.heroRetail}
                       alt="Kereskedelmi értékesítő tanulók friss gyümölcspultnál és mérlegnél"
                       referrerPolicy="no-referrer"
                       onError={() => setHeroImgFailed(true)}
-                      className="w-full h-full lg:h-full object-cover"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-emerald-900 text-white p-8">
-                      <Store className="w-12 h-12 mb-3 text-emerald-300" />
+                    <div className="w-full h-full flex flex-col items-center justify-center text-amber-300 p-8">
+                      <Store className="w-12 h-12 mb-2" />
                       <span className="font-display text-xl font-bold">
                         Kereskedelmi értékesítő szak
                       </span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <p className="text-xs text-emerald-200 font-medium">
-                      5 gyors állomás · 2–3 perc játékidő
-                    </p>
-                    <p className="mt-1 text-base sm:text-lg font-bold leading-snug">
-                      3 000 Ft-os bevásárlás, titkos doboz, polcrendezés, mérés és kassza
-                      árkalkuláció
-                    </p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0F1D40]/90 via-[#0F1D40]/20 to-transparent" />
+                  <div className="absolute bottom-4 left-6 right-6 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-200 font-medium">
+                    <span>3 000 Ft-os bevásárlás · Titkos doboz · Polc & Mérés · Kassza · PLU</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Right: Crisp Tactile Expo Pass Registration Card + Partners */}
+              <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+                <form
+                  onSubmit={handleStartSession}
+                  className="flex-1 rounded-3xl bg-white border-2 border-slate-200 tactile-card p-6 flex flex-col justify-between gap-5"
+                >
+                  <div>
+                    <p className="text-xs font-bold text-[#E11D48]">Kiállítási belépőkártya</p>
+                    <h2 className="mt-1 text-2xl font-extrabold text-[#0F1D40]">
+                      Indulhat a kihívás!
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                      A neved, osztályod és iskolád megjelenik a játékban, a toplistán és az
+                      okleveleden is.
+                    </p>
+
+                    <div className="mt-5 space-y-3.5">
+                      <div>
+                        <label
+                          htmlFor="player-name"
+                          className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                        >
+                          Teljes neved
+                        </label>
+                        <input
+                          id="player-name"
+                          type="text"
+                          required
+                          value={nameInput}
+                          onChange={(e) => {
+                            setNameInput(e.target.value);
+                            setFormError(null);
+                          }}
+                          placeholder="pl. Kovács Bence"
+                          className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <div className="sm:col-span-4">
+                          <label
+                            htmlFor="player-class"
+                            className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                          >
+                            Osztályod
+                          </label>
+                          <input
+                            id="player-class"
+                            type="text"
+                            required
+                            value={classInput}
+                            onChange={(e) => {
+                              setClassInput(e.target.value);
+                              setFormError(null);
+                            }}
+                            placeholder="pl. 8.a"
+                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="sm:col-span-8">
+                          <label
+                            htmlFor="player-school"
+                            className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                          >
+                            Iskolád neve
+                          </label>
+                          <input
+                            id="player-school"
+                            type="text"
+                            required
+                            value={schoolInput}
+                            onChange={(e) => {
+                              setSchoolInput(e.target.value);
+                              setFormError(null);
+                            }}
+                            placeholder="pl. Miskolci Kazinczy Ált. Isk."
+                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {formError && (
+                      <p role="alert" className="mt-3 text-xs font-bold text-rose-600">
+                        {formError}
+                      </p>
+                    )}
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="tactile-btn w-full min-h-[54px] rounded-2xl bg-[#E11D48] px-5 py-3.5 text-base font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                    Kihívás indítása
+                  </button>
+                </form>
 
                 {/* Partner Showcase Strip */}
-                <div className="rounded-2xl bg-white border border-slate-200 p-4">
-                  <p className="text-xs font-medium text-slate-500 mb-3">
-                    Duális és együttműködő partnereink
+                <div className="rounded-3xl bg-white border border-slate-200 tactile-card p-4">
+                  <p className="text-xs font-bold text-slate-500 mb-2.5">
+                    Együttműködő kereskedelmi partnereink
                   </p>
                   <PartnerLogos />
                 </div>
@@ -502,43 +531,78 @@ export default function App() {
           </div>
         )}
 
-        {/* HUB SCREEN (Player Profile + 5 Expo Stations) */}
+        {/* HUB SCREEN (Midnight Cobalt Expo Pass + 5 Station Ticket Cards) */}
         {screen === 'hub' && player && (
           <div className="space-y-6">
-            {/* Player Pass Card (Displays Name, Class, School clearly!) */}
-            <section className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 shrink-0">
-                    <UserCheck className="w-6 h-6" />
+            {/* Midnight Cobalt Player Pass with Progress Ring */}
+            <section className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-7 tactile-card">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+                <div className="flex items-center gap-4 min-w-0">
+                  {/* SVG Circular Progress Ring */}
+                  <div className="relative flex h-16 w-16 items-center justify-center shrink-0">
+                    <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64" aria-hidden="true">
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r={ringRadius}
+                        stroke="rgba(255,255,255,0.16)"
+                        strokeWidth="6"
+                        fill="none"
+                      />
+                      <circle
+                        cx="32"
+                        cy="32"
+                        r={ringRadius}
+                        stroke="#FBBF24"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        fill="none"
+                        strokeDasharray={ringCircumference}
+                        strokeDashoffset={ringOffset}
+                        className="transition-all duration-300"
+                      />
+                    </svg>
+                    <span className="absolute font-mono tabular-nums text-sm font-bold text-amber-300">
+                      {completedCount}/{CHALLENGES.length}
+                    </span>
                   </div>
+
                   <div className="min-w-0">
-                    <p className="text-xs font-medium text-emerald-700">
-                      Kiállítási résztvevő · {SCHOOL_SHORT_NAME}
+                    <p className="text-xs font-bold text-amber-300">
+                      Kiállítási belépőkártya · {SCHOOL_SHORT_NAME}
                     </p>
-                    <h1 className="mt-0.5 text-xl sm:text-2xl font-bold text-slate-900 truncate">
+                    <h1 className="mt-0.5 text-xl sm:text-2xl font-extrabold truncate">
                       {player.name}
                     </h1>
-                    <p className="mt-0.5 text-xs sm:text-sm text-slate-600 truncate">
+                    <p className="mt-0.5 text-xs sm:text-sm text-slate-300 truncate">
                       {player.school} <span aria-hidden="true">·</span>{' '}
-                      <strong className="font-semibold text-slate-800">{player.className}</strong>
+                      <strong className="font-bold text-white">{player.className}</strong>
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                {/* Right controls & total score */}
+                <div className="flex flex-wrap items-center gap-3 md:justify-end">
+                  <div className="rounded-2xl bg-white/10 px-4 py-2 text-right">
+                    <span className="block text-[11px] text-slate-300">Összpontszám</span>
+                    <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-amber-300">
+                      {totalScore} <span className="text-xs font-normal text-slate-300">/ 500</span>
+                    </span>
+                  </div>
+
                   <button
                     type="button"
                     onClick={toggleMute}
                     aria-label={muted ? 'Hang bekapcsolása' : 'Hang némítása'}
-                    className="min-h-[44px] min-w-[44px] rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 inline-flex items-center justify-center transition-colors"
+                    className="min-h-[44px] min-w-[44px] rounded-xl bg-white/10 text-white hover:bg-white/20 inline-flex items-center justify-center transition-colors"
                   >
                     {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
+
                   <button
                     type="button"
                     onClick={handleNewPlayer}
-                    className="min-h-[44px] rounded-xl border border-slate-200 bg-white px-3.5 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors inline-flex items-center gap-1.5 whitespace-nowrap"
+                    className="min-h-[44px] rounded-xl bg-white/10 px-3.5 text-xs sm:text-sm font-bold text-white hover:bg-white/20 transition-colors inline-flex items-center gap-1.5 whitespace-nowrap"
                   >
                     <UserPlus className="w-4 h-4" />
                     Új játékos
@@ -546,73 +610,52 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Progress + Reward metrics */}
-              <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 sm:grid-cols-3 gap-4 items-center">
-                <div>
-                  <span className="block text-xs text-slate-500">Teljesített kihívás</span>
-                  <span className="font-mono tabular-nums text-xl sm:text-2xl font-bold text-slate-900">
-                    {completedCount} / {CHALLENGES.length}
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-xs text-slate-500">Összpontszám</span>
-                  <span className="font-mono tabular-nums text-xl sm:text-2xl font-bold text-emerald-700">
-                    {totalScore} <span className="text-sm font-normal text-slate-400">/ 500</span>
-                  </span>
-                </div>
-                <div className="col-span-2 sm:col-span-1 flex sm:justify-end">
-                  {completedCount >= 1 ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        soundEngine.playPop();
-                        setScreen('certificate');
-                      }}
-                      className="w-full sm:w-auto min-h-[44px] rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-amber-400 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                      <Gift className="w-4 h-4" />
-                      Oklevél és jutalom
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
-                      className="w-full sm:w-auto min-h-[44px] rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                      <Play className="w-4 h-4 fill-current" />
-                      Első kihívás indítása
-                    </button>
-                  )}
-                </div>
-              </div>
+              {/* Action Strip inside Pass */}
+              <div className="mt-5 pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-xs sm:text-sm text-slate-200">
+                  {completedCount === 0
+                    ? 'Teljesíts legalább 1 kihívást a matrica, cukorka és a „Kis kereskedő” oklevél feloldásához!'
+                    : completedCount < CHALLENGES.length
+                    ? 'Az okleveled már feloldva! Játssz tovább a Mester Kereskedő rangért és a toplista éléért.'
+                    : 'Minden állomást teljesítettél! Nyisd meg a Mester Kereskedő okleveledet a standnál.'}
+                </p>
 
-              {/* Clean progress bar */}
-              <div className="mt-4 h-2 w-full rounded-full bg-slate-100 overflow-hidden">
-                <div
-                  className="h-full bg-emerald-600 rounded-full transition-all duration-300"
-                  style={{ width: `${(completedCount / CHALLENGES.length) * 100}%` }}
-                />
+                {completedCount >= 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      soundEngine.playPop();
+                      setScreen('certificate');
+                    }}
+                    className="tactile-btn min-h-[46px] rounded-2xl bg-amber-400 px-5 py-2.5 text-sm font-bold text-[#0F1D40] hover:bg-amber-300 transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0"
+                  >
+                    <Gift className="w-4 h-4" />
+                    Oklevél és jutalom
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
+                    className="tactile-btn min-h-[46px] rounded-2xl bg-[#E11D48] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap shrink-0"
+                  >
+                    <Play className="w-4 h-4 fill-current" />
+                    Első kihívás indítása
+                  </button>
+                )}
               </div>
-              <p className="mt-2 text-xs text-slate-500">
-                {completedCount === 0
-                  ? 'Teljesíts legalább 1 kihívást a matrica, cukorka és a „Kis kereskedő” oklevél feloldásához!'
-                  : completedCount < CHALLENGES.length
-                  ? 'Az okleveled már feloldva! Játssz tovább a magasabb rangért és a toplista éléért.'
-                  : 'Minden állomást teljesítettél! Nyisd meg a Mester Kereskedő okleveledet a standnál.'}
-              </p>
             </section>
 
-            {/* 5 Stations Grid */}
-            <section className="space-y-3">
+            {/* 5 Retail Station Cards */}
+            <section className="space-y-3.5">
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#0F1D40]">
                   Kereskedelmi állomások
                 </h2>
                 {completedCount < CHALLENGES.length && (
                   <button
                     type="button"
                     onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
-                    className="text-xs sm:text-sm font-semibold text-emerald-800 hover:underline whitespace-nowrap"
+                    className="text-xs sm:text-sm font-bold text-[#E11D48] hover:underline whitespace-nowrap"
                   >
                     Következő: {nextUncompletedChallenge.shortTitle} →
                   </button>
@@ -628,23 +671,26 @@ export default function App() {
                       key={ch.id}
                       type="button"
                       onClick={() => handleLaunchChallenge(ch.id)}
-                      className={`group flex flex-col justify-between rounded-2xl border p-5 text-left transition-all active:scale-[0.99] min-h-[168px] ${
+                      className={`group flex flex-col justify-between rounded-3xl border-2 p-5 text-left transition-all active:scale-[0.99] min-h-[184px] tactile-card ${
                         isDone
-                          ? 'border-emerald-200 bg-emerald-50/40 hover:border-emerald-400'
-                          : 'border-slate-200 bg-white hover:border-emerald-600'
+                          ? 'border-[#0F1D40] bg-amber-50/45 hover:bg-amber-50/75'
+                          : 'border-slate-200 bg-white hover:border-[#0F1D40]'
                       }`}
                     >
                       <div>
-                        <div className="flex items-center justify-between gap-2 text-xs text-slate-500">
-                          <span>
-                            0{ch.order}. állomás <span aria-hidden="true">·</span> {ch.durationLabel}{' '}
-                            <span aria-hidden="true">·</span> {ch.partnerTag}
+                        <div className="flex items-start justify-between gap-3">
+                          <span
+                            className={`font-mono tabular-nums text-2xl font-bold leading-none ${
+                              isDone ? 'text-[#0F1D40]' : 'text-slate-300 group-hover:text-[#E11D48]'
+                            } transition-colors`}
+                          >
+                            0{ch.order}
                           </span>
-                          {isDone && (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
-                          )}
+                          <span className="text-xs font-medium text-slate-500 text-right">
+                            {ch.durationLabel} <span aria-hidden="true">·</span> {ch.partnerTag}
+                          </span>
                         </div>
-                        <h3 className="mt-2 text-lg font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
+                        <h3 className="mt-3 text-lg font-extrabold text-[#0B1220] group-hover:text-[#0F1D40] transition-colors">
                           {ch.title}
                         </h3>
                         <p className="mt-1.5 text-sm text-slate-600 leading-relaxed">
@@ -654,15 +700,21 @@ export default function App() {
 
                       <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
                         {isDone && res ? (
-                          <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-emerald-800">
-                            {res.score} / {res.maxScore} pont · Újrajátszás
+                          <span className="inline-flex items-center gap-2 font-mono tabular-nums text-xs sm:text-sm font-bold text-[#0F1D40]">
+                            <CheckCircle2 className="w-4 h-4 text-[#0F1D40]" />
+                            <span className="bg-[#FDE047] px-2 py-0.5 rounded">
+                              {res.score} / {res.maxScore} pt
+                            </span>
+                            <span className="font-sans font-semibold text-slate-500">
+                              Újrajátszás
+                            </span>
                           </span>
                         ) : (
-                          <span className="text-xs sm:text-sm font-semibold text-emerald-800">
-                            Kihívás indítása
+                          <span className="text-xs sm:text-sm font-bold text-[#E11D48]">
+                            Állomás indítása
                           </span>
                         )}
-                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-700 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#0F1D40] group-hover:translate-x-0.5 transition-all shrink-0" />
                       </div>
                     </button>
                   );
@@ -671,9 +723,9 @@ export default function App() {
             </section>
 
             {/* Footer Partner Strip */}
-            <footer className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <footer className="rounded-3xl bg-white border border-slate-200 tactile-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold text-slate-800">{SCHOOL_FULL_NAME}</p>
+                <p className="text-xs font-bold text-[#0F1D40]">{SCHOOL_FULL_NAME}</p>
                 <p className="text-xs text-slate-500 mt-0.5">
                   {PROGRAM_NAME} szak · Együttműködő partnereink
                 </p>
@@ -686,7 +738,6 @@ export default function App() {
         {/* ACTIVE CHALLENGE SCREEN */}
         {screen === 'challenge' && player && activeChallengeMeta && (
           <div className="space-y-5">
-            {/* Compact contextual sub-header showing Back + Player Name/Class/School */}
             <div className="flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
@@ -696,95 +747,91 @@ export default function App() {
                   setActiveChallengeId(null);
                   setJustFinished(null);
                 }}
-                className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors whitespace-nowrap"
+                className="min-h-[44px] inline-flex items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-3.5 py-2 text-sm font-bold text-[#0F1D40] hover:border-[#0F1D40] transition-colors whitespace-nowrap"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Állomások
               </button>
 
               <p className="text-xs sm:text-sm text-slate-600 truncate max-w-full">
-                <strong className="font-semibold text-slate-900">{player.name}</strong>{' '}
+                <strong className="font-bold text-[#0F1D40]">{player.name}</strong>{' '}
                 <span aria-hidden="true">·</span> {player.className}{' '}
                 <span aria-hidden="true">·</span> {player.school}
               </p>
             </div>
 
-            {/* Post-challenge celebration / next-step card */}
             {justFinished ? (
-              <div className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 max-w-2xl mx-auto text-center space-y-5">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                  <CheckCircle2 className="w-8 h-8" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-emerald-700">
+              <div className="rounded-3xl bg-white border-2 border-[#0F1D40] tactile-card overflow-hidden max-w-2xl mx-auto">
+                <div className="bg-[#0F1D40] text-white p-6 sm:p-8 text-center">
+                  <p className="text-xs font-bold text-amber-300">
                     {activeChallengeMeta.title} · Teljesítve
                   </p>
-                  <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-slate-900">
+                  <h2 className="mt-1.5 text-2xl sm:text-3xl font-extrabold">
                     Szép munka, {player.name}!
                   </h2>
-                  <p className="mt-2 font-mono tabular-nums text-3xl font-bold text-emerald-700">
+                  <p className="mt-3 font-mono tabular-nums text-4xl font-bold text-amber-300">
                     +{justFinished.score} pont
                   </p>
-                  <p className="mt-1 text-sm text-slate-600">{justFinished.summary}</p>
+                  <p className="mt-1.5 text-sm text-slate-200">{justFinished.summary}</p>
                 </div>
 
-                <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-950">
-                  <p className="font-semibold">
+                <div className="p-6 sm:p-8 text-center space-y-5">
+                  <div className="rounded-2xl bg-amber-50 border-2 border-amber-300 p-4 text-sm text-[#0F1D40] font-semibold">
                     {completedCount === 1
                       ? 'Feloldottad a „Kis kereskedő” okleveledet és a standnál járó jutalmat!'
                       : `Már ${completedCount} / ${CHALLENGES.length} állomást teljesítettél! Összpontszámod: ${totalScore} pont.`}
-                  </p>
-                </div>
+                  </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  {completedCount < CHALLENGES.length ? (
-                    <button
-                      type="button"
-                      onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
-                      className="min-h-[50px] rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                      Következő: {nextUncompletedChallenge.shortTitle}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {completedCount < CHALLENGES.length ? (
+                      <button
+                        type="button"
+                        onClick={() => handleLaunchChallenge(nextUncompletedChallenge.id)}
+                        className="tactile-btn min-h-[52px] rounded-2xl bg-[#E11D48] px-5 py-3 text-sm font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                      >
+                        Következő: {nextUncompletedChallenge.shortTitle}
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          soundEngine.playCashRegister();
+                          setScreen('certificate');
+                        }}
+                        className="tactile-btn min-h-[52px] rounded-2xl bg-[#E11D48] px-5 py-3 text-sm font-bold text-white hover:bg-[#BE123C] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                      >
+                        <Award className="w-4 h-4" />
+                        Mester Oklevél megnyitása
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => {
-                        soundEngine.playCashRegister();
+                        soundEngine.playPop();
                         setScreen('certificate');
                       }}
-                      className="min-h-[50px] rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-800 active:scale-[0.98] transition-all inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                      className="min-h-[52px] rounded-2xl border-2 border-slate-200 bg-white px-5 py-3 text-sm font-bold text-[#0F1D40] hover:border-[#0F1D40] transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
                       <Award className="w-4 h-4" />
-                      Mester Oklevél megnyitása
+                      Oklevél megtekintése
                     </button>
-                  )}
+                  </div>
 
                   <button
                     type="button"
                     onClick={() => {
                       soundEngine.playPop();
-                      setScreen('certificate');
+                      setScreen('hub');
+                      setActiveChallengeId(null);
+                      setJustFinished(null);
                     }}
-                    className="min-h-[50px] rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                    className="min-h-[40px] text-xs sm:text-sm font-bold text-slate-500 hover:text-[#0F1D40]"
                   >
-                    <Award className="w-4 h-4" />
-                    Oklevél megtekintése
+                    Vissza az állomások listájához
                   </button>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundEngine.playPop();
-                    setScreen('hub');
-                    setActiveChallengeId(null);
-                    setJustFinished(null);
-                  }}
-                  className="min-h-[40px] text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900"
-                >
-                  Vissza az állomások listájához
-                </button>
               </div>
             ) : (
               <div>
@@ -846,6 +893,9 @@ export default function App() {
           <LeaderboardView
             entries={leaderboard}
             currentPlayerId={player?.id}
+            isSharedCloud={isSupabaseConfigured}
+            isLoading={isLoadingLeaderboard}
+            onRefresh={() => void refreshCloudLeaderboard()}
             onClearEntries={() => {
               soundEngine.playPop();
               setLeaderboard([]);
@@ -855,11 +905,11 @@ export default function App() {
         )}
       </main>
 
-      {/* Mobile Bottom Tab Bar (Thumb-Zone Ergonomics, shown on phones when logged in outside active play) */}
+      {/* Mobile Bottom Tab Bar */}
       {showMobileBottomNav && (
         <nav
           aria-label="Mobil navigáció"
-          className="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 pb-safe"
+          className="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0F1D40]/95 backdrop-blur-md border-t border-white/10 pb-safe text-white"
         >
           <div className="grid grid-cols-3 h-14 items-center">
             <button
@@ -869,7 +919,7 @@ export default function App() {
                 setScreen('hub');
               }}
               className={`min-h-[48px] flex flex-col items-center justify-center gap-0.5 ${
-                screen === 'hub' ? 'text-emerald-700 font-semibold' : 'text-slate-500'
+                screen === 'hub' ? 'text-amber-300 font-bold' : 'text-slate-300'
               }`}
             >
               <Compass className="w-5 h-5" />
@@ -882,7 +932,7 @@ export default function App() {
                 setScreen('certificate');
               }}
               className={`min-h-[48px] flex flex-col items-center justify-center gap-0.5 ${
-                screen === 'certificate' ? 'text-emerald-700 font-semibold' : 'text-slate-500'
+                screen === 'certificate' ? 'text-amber-300 font-bold' : 'text-slate-300'
               }`}
             >
               <Award className="w-5 h-5" />
@@ -895,7 +945,7 @@ export default function App() {
                 setScreen('leaderboard');
               }}
               className={`min-h-[48px] flex flex-col items-center justify-center gap-0.5 ${
-                screen === 'leaderboard' ? 'text-emerald-700 font-semibold' : 'text-slate-500'
+                screen === 'leaderboard' ? 'text-amber-300 font-bold' : 'text-slate-300'
               }`}
             >
               <Trophy className="w-5 h-5" />

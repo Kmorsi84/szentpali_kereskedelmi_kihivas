@@ -1,69 +1,86 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+export interface PartnerItem {
+  id: string;
+  name: string;
+  logoSrc: string;
+}
+
+export const RETAIL_PARTNERS: PartnerItem[] = [
+  {
+    id: 'auchan',
+    name: 'Auchan',
+    logoSrc: '/assets/aistudio/auchan_nagy_keretes_4d7a1bae.jpg',
+  },
+  {
+    id: 'metro',
+    name: 'METRO',
+    logoSrc: '/assets/aistudio/metro_8c3dfdd6.png',
+  },
+  {
+    id: 'interspar',
+    name: 'INTERSPAR',
+    logoSrc: '/assets/aistudio/interspar_bee23085.png',
+  },
+  {
+    id: 'coop',
+    name: 'Unió Coop Zrt.',
+    logoSrc: '/assets/aistudio/coop_6ae5cae9.png',
+  },
+];
 
 interface PartnerLogosProps {
   compact?: boolean;
 }
 
 export const PartnerLogos: React.FC<PartnerLogosProps> = ({ compact = false }) => {
+  const [failedMap, setFailedMap] = useState<Record<string, boolean>>({});
+
   return (
-    <div className={compact ? 'flex flex-wrap items-center gap-x-5 gap-y-2' : 'grid grid-cols-3 gap-3'}>
-      {/* Tesco */}
-      <div
-        className={
-          compact
-            ? 'flex items-center gap-1.5'
-            : 'flex flex-col items-center justify-center rounded-xl bg-white border border-slate-200 px-3 py-3'
-        }
-      >
-        <span className="font-display font-bold tracking-wider text-[#00539F] text-sm sm:text-base">
-          TESCO
-        </span>
-        {!compact && (
-          <div className="mt-1 flex gap-0.5" aria-hidden="true">
-            <span className="h-1 w-2.5 bg-[#EE1C2E]" />
-            <span className="h-1 w-2.5 bg-[#EE1C2E]" />
-            <span className="h-1 w-2.5 bg-[#EE1C2E]" />
+    <div
+      className={
+        compact
+          ? 'flex flex-wrap items-center justify-center sm:justify-end gap-3'
+          : 'grid grid-cols-2 sm:grid-cols-4 gap-2.5'
+      }
+    >
+      {RETAIL_PARTNERS.map((partner) => {
+        const failed = Boolean(failedMap[partner.id]);
+        return (
+          <div
+            key={partner.id}
+            title={partner.name}
+            className={
+              compact
+                ? 'flex items-center justify-center rounded-xl bg-white border border-slate-200 px-3 py-1.5 h-11 min-w-[84px]'
+                : 'flex items-center justify-center rounded-2xl bg-white border border-slate-200 px-3 py-2.5 h-16'
+            }
+          >
+            {!failed ? (
+              <img
+                src={partner.logoSrc}
+                alt={`${partner.name} logó`}
+                referrerPolicy="no-referrer"
+                onError={() =>
+                  setFailedMap((prev) => ({
+                    ...prev,
+                    [partner.id]: true,
+                  }))
+                }
+                className={
+                  compact
+                    ? 'max-h-7 max-w-[92px] w-auto object-contain'
+                    : 'max-h-10 max-w-full w-auto object-contain'
+                }
+              />
+            ) : (
+              <span className="font-display font-bold text-xs sm:text-sm text-[#0F1D40] whitespace-nowrap">
+                {partner.name}
+              </span>
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Interspar */}
-      <div
-        className={
-          compact
-            ? 'flex items-center gap-1.5'
-            : 'flex flex-col items-center justify-center rounded-xl bg-white border border-slate-200 px-3 py-3'
-        }
-      >
-        <span className="font-display font-bold tracking-tight text-sm sm:text-base">
-          <span className="text-[#007A3D]">INTER</span>
-          <span className="text-[#E30613]">SPAR</span>
-        </span>
-        {!compact && (
-          <div className="mt-1 flex gap-0.5" aria-hidden="true">
-            <span className="h-1 w-4 bg-[#007A3D]" />
-            <span className="h-1 w-4 bg-[#E30613]" />
-          </div>
-        )}
-      </div>
-
-      {/* Coop */}
-      <div
-        className={
-          compact
-            ? 'flex items-center gap-1.5'
-            : 'flex flex-col items-center justify-center rounded-xl bg-white border border-slate-200 px-3 py-3'
-        }
-      >
-        <span className="font-display font-bold tracking-wide text-[#006B3F] text-sm sm:text-base">
-          coop
-        </span>
-        {!compact && (
-          <div className="mt-1 flex gap-0.5" aria-hidden="true">
-            <span className="h-1 w-8 bg-[#F59E0B]" />
-          </div>
-        )}
-      </div>
+        );
+      })}
     </div>
   );
 };
