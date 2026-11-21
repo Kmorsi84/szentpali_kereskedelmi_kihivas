@@ -159,26 +159,30 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
 
       {/* STEP 1: Fast Shelf Sorting */}
       {step === 'shelf' && currentShelfItem && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-200 tactile-card p-6 flex flex-col items-center justify-center text-center">
-            <p className="text-xs font-bold text-[#0F1D40]">
-              Beérkező áru ({shelfQueueIndex + 1} / {SHELF_ITEMS.length})
-            </p>
-            <div className="my-5 flex h-28 w-28 items-center justify-center rounded-3xl bg-[#F4F5F8] border-2 border-slate-200">
-              <ProductArtwork art={currentShelfItem.art} className="w-20 h-20" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+          <div className="lg:col-span-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4 sm:p-6 flex flex-row lg:flex-col items-center lg:justify-center gap-4 lg:text-center">
+            <div className="flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-2xl sm:rounded-3xl bg-[#F4F5F8] border-2 border-slate-200 shrink-0">
+              <ProductArtwork art={currentShelfItem.art} className="w-14 h-14 sm:w-20 sm:h-20" />
             </div>
-            <h3 className="text-2xl font-bold text-[#0B1220]">{currentShelfItem.name}</h3>
-            <p className="mt-1 text-sm text-slate-600">
-              Koppints arra a bolti polcra, ahová ki kell helyezni!
-            </p>
-            {shelfFeedback && (
-              <p className="mt-4 text-xs font-semibold text-[#0F1D40] bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 w-full">
-                {shelfFeedback}
+            <div className="min-w-0 flex-1 lg:flex-none">
+              <p className="text-xs font-bold text-[#0F1D40]">
+                Beérkező áru ({shelfQueueIndex + 1} / {SHELF_ITEMS.length})
               </p>
-            )}
+              <h3 className="mt-0.5 text-lg sm:text-2xl font-bold text-[#0B1220]">
+                {currentShelfItem.name}
+              </h3>
+              <p className="mt-0.5 text-xs sm:text-sm text-slate-600">
+                Koppints a megfelelő polcra!
+              </p>
+              {shelfFeedback && (
+                <p className="mt-2.5 text-xs font-semibold text-[#0F1D40] bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                  {shelfFeedback}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="lg:col-span-7 space-y-3">
+          <div className="lg:col-span-7 space-y-2.5 sm:space-y-3">
             {SHELF_CATEGORIES.map((shelf, index) => {
               const itemsOnShelf = placedByShelf[shelf.id];
               return (
@@ -186,21 +190,21 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
                   key={shelf.id}
                   type="button"
                   onClick={() => handleShelfSelect(shelf.id)}
-                  className="w-full min-h-[92px] rounded-3xl border-2 border-slate-200 bg-white p-4 sm:p-5 text-left hover:border-[#0F1D40] hover:bg-indigo-50/30 active:scale-[0.99] transition-all tactile-card flex items-center justify-between gap-4"
+                  className="w-full min-h-[76px] sm:min-h-[92px] rounded-2xl sm:rounded-3xl border-2 border-slate-200 bg-white p-3.5 sm:p-5 text-left hover:border-[#0F1D40] hover:bg-indigo-50/30 active:scale-[0.99] transition-all tactile-card flex items-center justify-between gap-3"
                 >
-                  <div>
-                    <p className="text-xs font-mono font-bold text-slate-400">0{index + 1}. SOR</p>
-                    <p className="text-base sm:text-lg font-bold text-[#0B1220] mt-0.5">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-mono font-bold text-slate-400">0{index + 1}. SOR</p>
+                    <p className="text-sm sm:text-lg font-bold text-[#0B1220] mt-0.5">
                       {shelf.title}
                     </p>
                     <p className="text-xs text-slate-500 mt-0.5">{shelf.subtitle}</p>
                     {itemsOnShelf.length > 0 && (
-                      <p className="mt-2 text-xs font-bold text-[#0F1D40]">
+                      <p className="mt-1.5 text-xs font-bold text-[#0F1D40] truncate">
                         Polcon: {itemsOnShelf.join(', ')}
                       </p>
                     )}
                   </div>
-                  <span className="shrink-0 rounded-xl bg-[#0F1D40] px-3.5 py-2 text-xs font-bold text-amber-300">
+                  <span className="shrink-0 rounded-xl bg-[#0F1D40] px-3 py-2 text-xs font-bold text-amber-300">
                     Ide teszem
                   </span>
                 </button>
@@ -212,9 +216,9 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
 
       {/* STEP 2: Dry Goods Weighing */}
       {step === 'weigh' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-          <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
-            <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+          <div className="lg:col-span-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
+            <div className="h-32 sm:h-auto sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
               {!scaleImgFailed ? (
                 <img
                   src={IMAGES.dryGoodsScale}
@@ -229,22 +233,22 @@ export const ShelfAndPackChallenge: React.FC<ShelfAndPackChallengeProps> = ({ on
                 </div>
               )}
             </div>
-            <div className="p-5">
+            <div className="p-4 sm:p-5">
               <p className="text-xs font-bold text-[#E11D48]">Mérési feladat · Kimért szárazáru</p>
-              <h3 className="mt-1 text-lg font-bold text-[#0B1220]">
+              <h3 className="mt-0.5 text-base sm:text-lg font-bold text-[#0B1220]">
                 Mérj ki pontosan {weighingTask.targetGrams} g {weighingTask.itemName.toLowerCase()}t!
               </h3>
-              <p className="mt-1.5 text-xs sm:text-sm text-slate-600">
+              <p className="mt-1 text-xs sm:text-sm text-slate-600">
                 Egységár:{' '}
                 <span className="font-mono tabular-nums font-bold text-[#0F1D40]">
                   {formatFt(weighingTask.unitPricePerKg)}/kg
                 </span>{' '}
-                · Tűréshatár: ±{weighingTask.toleranceGrams} g
+                · Tűrés: ±{weighingTask.toleranceGrams} g
               </p>
             </div>
           </div>
 
-          <div className="lg:col-span-7 rounded-3xl bg-white border border-slate-200 tactile-card p-5 sm:p-6 flex flex-col justify-between gap-5">
+          <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4 sm:p-6 flex flex-col justify-between gap-4 sm:gap-5">
             {/* Digital Retail Scale Console */}
             <div className="rounded-2xl bg-[#0B1220] p-5 text-white border-2 border-[#1E3368]">
               <div className="flex items-center justify-between text-xs text-slate-400 font-mono">

@@ -40,36 +40,53 @@ export const PricingChallenge: React.FC<PricingChallengeProps> = ({ onComplete }
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       {/* Midnight Cobalt Header */}
-      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
+      <div className="rounded-2xl sm:rounded-3xl bg-[#0F1D40] text-white p-4 sm:p-6 tactile-card">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-amber-300 font-medium">
+            <p className="text-[11px] sm:text-xs text-amber-300 font-medium">
               04. állomás · {questionIndex + 1} / {PRICING_QUESTIONS.length}. kérdés · METRO Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
-              Kereskedelmi Árkalkuláció a Kasszánál
+            <h2 className="mt-0.5 text-lg sm:text-2xl font-bold">
+              Kereskedelmi Árkalkuláció
             </h2>
           </div>
           <div className="text-right shrink-0">
             <span className="block text-[11px] text-slate-300">Helyes</span>
-            <span className="font-mono tabular-nums text-xl font-bold text-amber-300">
+            <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-amber-300">
               {correctCount} / {PRICING_QUESTIONS.length}
             </span>
           </div>
         </div>
       </div>
 
-      {/* 2-col layout: Receipt Price Table + Cash Register Question */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      {/* 2-col layout: Compact 2x2 price strip on mobile, full table on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
         {/* Price Table */}
-        <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-[#FAF9F6]">
-            <span className="text-xs font-bold text-[#0F1D40]">Napi egységár-táblázat</span>
+        <div className="lg:col-span-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden">
+          <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 sm:py-3.5 border-b border-slate-200 bg-[#FAF9F6]">
+            <span className="text-xs font-bold text-[#0F1D40]">Egységárak (Ft/kg)</span>
             <Calculator className="w-4 h-4 text-[#0F1D40]" aria-hidden="true" />
           </div>
-          <table className="w-full text-sm">
+
+          {/* Mobile compact 2x2 grid */}
+          <div className="grid grid-cols-2 gap-2 p-3 lg:hidden">
+            {PRICING_TABLE.map((row) => (
+              <div
+                key={row.product}
+                className="flex items-center justify-between gap-1.5 rounded-xl bg-[#F4F5F8] px-2.5 py-2"
+              >
+                <span className="text-xs font-bold text-[#0B1220]">{row.product}</span>
+                <span className="font-mono tabular-nums text-xs font-bold text-[#0B1220] bg-[#FDE047] px-1.5 py-0.5 rounded shrink-0">
+                  {row.pricePerKg.toLocaleString('hu-HU')}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop full table */}
+          <table className="hidden lg:table w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs text-slate-500">
                 <th className="py-2.5 px-5 font-semibold">Termék</th>
@@ -92,10 +109,10 @@ export const PricingChallenge: React.FC<PricingChallengeProps> = ({ onComplete }
         </div>
 
         {/* Question Card */}
-        <div className="lg:col-span-7 rounded-3xl bg-white border border-slate-200 tactile-card p-5 sm:p-6 space-y-5">
+        <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div>
             <p className="text-xs font-bold text-[#E11D48]">{currentQuestion.tag}</p>
-            <h3 className="mt-1.5 text-xl sm:text-2xl font-bold text-[#0B1220] leading-snug">
+            <h3 className="mt-1 text-lg sm:text-2xl font-bold text-[#0B1220] leading-snug">
               {currentQuestion.prompt}
             </h3>
           </div>

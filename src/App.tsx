@@ -347,9 +347,16 @@ export default function App() {
                   setScreen('certificate');
                   setActiveChallengeId(null);
                 }}
-                className="min-h-[38px] rounded-xl bg-amber-400 px-3.5 py-2 text-xs sm:text-sm font-bold text-[#0F1D40] hover:bg-amber-300 transition-colors whitespace-nowrap shrink-0"
+                className="min-h-[38px] rounded-xl bg-amber-400 px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-bold text-[#0F1D40] hover:bg-amber-300 transition-colors whitespace-nowrap shrink-0"
               >
-                {completedCount >= 1 ? 'Oklevél megnyitása' : `Haladás: ${completedCount}/5`}
+                {completedCount >= 1 ? (
+                  <>
+                    <span className="sm:hidden">Oklevél</span>
+                    <span className="hidden sm:inline">Oklevél megnyitása</span>
+                  </>
+                ) : (
+                  `${completedCount}/5 kész`
+                )}
               </button>
             ) : (
               <button
@@ -375,18 +382,18 @@ export default function App() {
       >
         {/* WELCOME / REGISTRATION SCREEN */}
         {screen === 'welcome' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-              {/* Left: Bold Midnight Cobalt Editorial Poster + Retail Photo */}
-              <div className="lg:col-span-7 rounded-3xl bg-[#0F1D40] text-white overflow-hidden tactile-card flex flex-col justify-between">
-                <div className="p-6 sm:p-8 space-y-3">
-                  <p className="text-xs sm:text-sm font-bold text-amber-300">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch">
+              {/* Left: Bold Midnight Cobalt Editorial Poster + Retail Photo (compact on mobile so form is immediately visible) */}
+              <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-[#0F1D40] text-white overflow-hidden tactile-card flex flex-col justify-between">
+                <div className="p-5 sm:p-8 space-y-2 sm:space-y-3">
+                  <p className="text-[11px] sm:text-sm font-bold text-amber-300 leading-snug">
                     {SCHOOL_FULL_NAME}
                   </p>
                   <p className="text-xs text-slate-300">
-                    {PROGRAM_NAME} szak · Pályaválasztási kiállítás · 2–3 perc játékidő
+                    {PROGRAM_NAME} szak · Pályaválasztási kiállítás · 2–3 perc
                   </p>
-                  <h1 className="pt-1 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.08]">
+                  <h1 className="pt-0.5 text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.08]">
                     Mérj, csomagolj és számolj!
                   </h1>
                   <p className="text-sm sm:text-base text-slate-200 leading-relaxed max-w-xl">
@@ -396,7 +403,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="relative h-52 sm:h-64 w-full bg-[#162A5C] overflow-hidden mt-2">
+                <div className="hidden sm:block relative h-56 lg:h-64 w-full bg-[#162A5C] overflow-hidden mt-2">
                   {!heroImgFailed ? (
                     <img
                       src={IMAGES.heroRetail}
@@ -424,11 +431,11 @@ export default function App() {
               <div className="lg:col-span-5 flex flex-col justify-between gap-4">
                 <form
                   onSubmit={handleStartSession}
-                  className="flex-1 rounded-3xl bg-white border-2 border-slate-200 tactile-card p-6 flex flex-col justify-between gap-5"
+                  className="flex-1 rounded-2xl sm:rounded-3xl bg-white border-2 border-slate-200 tactile-card p-5 sm:p-6 flex flex-col justify-between gap-4 sm:gap-5"
                 >
                   <div>
                     <p className="text-xs font-bold text-[#E11D48]">Kiállítási belépőkártya</p>
-                    <h2 className="mt-1 text-2xl font-extrabold text-[#0F1D40]">
+                    <h2 className="mt-0.5 text-xl sm:text-2xl font-extrabold text-[#0F1D40]">
                       Indulhat a kihívás!
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 mt-1">
@@ -436,17 +443,18 @@ export default function App() {
                       okleveleden is.
                     </p>
 
-                    <div className="mt-5 space-y-3.5">
+                    <div className="mt-4 space-y-3">
                       <div>
                         <label
                           htmlFor="player-name"
-                          className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                          className="block text-xs font-bold text-[#0F1D40] mb-1"
                         >
                           Teljes neved
                         </label>
                         <input
                           id="player-name"
                           type="text"
+                          autoComplete="name"
                           required
                           value={nameInput}
                           onChange={(e) => {
@@ -454,15 +462,15 @@ export default function App() {
                             setFormError(null);
                           }}
                           placeholder="pl. Kovács Bence"
-                          className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                          className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-base font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                        <div className="sm:col-span-4">
+                      <div className="grid grid-cols-12 gap-2.5 sm:gap-3">
+                        <div className="col-span-4">
                           <label
                             htmlFor="player-class"
-                            className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                            className="block text-xs font-bold text-[#0F1D40] mb-1"
                           >
                             Osztályod
                           </label>
@@ -476,14 +484,14 @@ export default function App() {
                               setFormError(null);
                             }}
                             placeholder="pl. 8.a"
-                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-3 sm:px-4 py-2.5 text-base font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
                           />
                         </div>
 
-                        <div className="sm:col-span-8">
+                        <div className="col-span-8">
                           <label
                             htmlFor="player-school"
-                            className="block text-xs font-bold text-[#0F1D40] mb-1.5"
+                            className="block text-xs font-bold text-[#0F1D40] mb-1"
                           >
                             Iskolád neve
                           </label>
@@ -497,7 +505,7 @@ export default function App() {
                               setFormError(null);
                             }}
                             placeholder="pl. Miskolci Kazinczy Ált. Isk."
-                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-4 py-2.5 text-sm font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
+                            className="w-full min-h-[48px] rounded-2xl border-2 border-slate-200 bg-[#F4F5F8] px-3.5 sm:px-4 py-2.5 text-base font-medium text-[#0B1220] placeholder:text-slate-400 focus:border-[#0F1D40] focus:bg-white focus:outline-none transition-colors"
                           />
                         </div>
                       </div>
@@ -520,7 +528,7 @@ export default function App() {
                 </form>
 
                 {/* Partner Showcase Strip */}
-                <div className="rounded-3xl bg-white border border-slate-200 tactile-card p-4">
+                <div className="rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4">
                   <p className="text-xs font-bold text-slate-500 mb-2.5">
                     Együttműködő kereskedelmi partnereink
                   </p>

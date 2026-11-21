@@ -43,14 +43,14 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
   return (
     <div className="space-y-5">
       {/* Midnight Cobalt Header */}
-      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
+      <div className="rounded-2xl sm:rounded-3xl bg-[#0F1D40] text-white p-4 sm:p-6 tactile-card">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-amber-300 font-medium">
+            <p className="text-[11px] sm:text-xs text-amber-300 font-medium">
               05. állomás · {index + 1} / {PRODUCE_QUIZ_ITEMS.length}. kép · Interspar Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
-              Milyen gyümölcsöt, zöldséget látsz a képen?
+            <h2 className="mt-0.5 text-lg sm:text-2xl font-bold">
+              Milyen gyümölcsöt, zöldséget látsz?
             </h2>
           </div>
           <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-[#0F1D40] bg-[#FDE047] px-2.5 py-1 rounded-lg shrink-0">
@@ -59,10 +59,10 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
         {/* Studio Produce Photo */}
-        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
-          <div className="aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+        <div className="lg:col-span-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
+          <div className="aspect-[16/10] sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
             {!brokenImages[current.id] ? (
               <img
                 src={current.image}
@@ -92,12 +92,12 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
         </div>
 
         {/* 4 Choices + Tip */}
-        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card p-5 sm:p-6 flex flex-col justify-between gap-4">
+        <div className="lg:col-span-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card p-4 sm:p-6 flex flex-col justify-between gap-4">
           <div className="space-y-3">
-            <p className="text-sm font-bold text-[#0F1D40]">
+            <p className="text-xs sm:text-sm font-bold text-[#0F1D40]">
               Válaszd ki a helyes megnevezést a mérleghez:
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
               {current.options.map((opt) => {
                 const isSelected = selected === opt;
                 const isRight = opt === current.correctName;
@@ -119,7 +119,7 @@ export const ProduceQuizChallenge: React.FC<ProduceQuizChallengeProps> = ({ onCo
                     type="button"
                     disabled={isAnswered}
                     onClick={() => handleChoose(opt)}
-                    className={`min-h-[60px] rounded-2xl border-2 px-4 py-3 text-left text-base font-bold transition-all active:scale-[0.98] ${cls}`}
+                    className={`min-h-[56px] sm:min-h-[60px] rounded-2xl border-2 px-3 sm:px-4 py-3 text-left text-sm sm:text-base font-bold transition-all active:scale-[0.98] ${cls}`}
                   >
                     {opt}
                   </button>

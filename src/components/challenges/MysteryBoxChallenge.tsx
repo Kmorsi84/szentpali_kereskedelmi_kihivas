@@ -75,18 +75,18 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
   return (
     <div className="space-y-5">
       {/* Midnight Cobalt Header + Mode Switch */}
-      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
+      <div className="rounded-2xl sm:rounded-3xl bg-[#0F1D40] text-white p-4 sm:p-6 tactile-card">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <p className="text-xs text-amber-300 font-medium">
+            <p className="text-[11px] sm:text-xs text-amber-300 font-medium">
               02. állomás · {roundIndex + 1} / {rounds.length}. kör · Unió Coop Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
+            <h2 className="mt-0.5 text-lg sm:text-2xl font-bold">
               Felismered, mit rejt a titkos doboz?
             </h2>
           </div>
           <div
-            className="inline-flex items-center gap-1 rounded-xl bg-white/10 p-1 self-start sm:self-auto"
+            className="grid grid-cols-2 sm:inline-flex items-center gap-1 rounded-xl bg-white/10 p-1 w-full sm:w-auto"
             role="group"
             aria-label="Játékmód"
           >
@@ -96,7 +96,7 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 soundEngine.playPop();
                 setMode('digital');
               }}
-              className={`min-h-[38px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
+              className={`min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
                 mode === 'digital'
                   ? 'bg-amber-400 text-[#0F1D40]'
                   : 'text-slate-200 hover:text-white'
@@ -110,7 +110,7 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
                 soundEngine.playPop();
                 setMode('booth');
               }}
-              className={`min-h-[38px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
+              className={`min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-lg transition-colors whitespace-nowrap ${
                 mode === 'booth'
                   ? 'bg-amber-400 text-[#0F1D40]'
                   : 'text-slate-200 hover:text-white'
@@ -125,8 +125,8 @@ export const MysteryBoxChallenge: React.FC<MysteryBoxChallengeProps> = ({ onComp
       {/* Main layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
         {/* Mystery Box Stage */}
-        <div className="lg:col-span-6 rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
-          <div className="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+        <div className="lg:col-span-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-200 tactile-card overflow-hidden flex flex-col">
+          <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full bg-slate-100 overflow-hidden">
             {!imageFailed ? (
               <img
                 src={IMAGES.mysteryBox}

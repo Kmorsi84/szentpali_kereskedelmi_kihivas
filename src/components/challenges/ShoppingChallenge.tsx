@@ -221,22 +221,22 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
   const budgetPercent = Math.min(100, Math.round((totalSpent / SHOPPING_BUDGET) * 100));
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 pb-24 sm:pb-0">
       {/* Midnight Cobalt Wallet Header */}
-      <div className="rounded-3xl bg-[#0F1D40] text-white p-5 sm:p-6 tactile-card">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="rounded-2xl sm:rounded-3xl bg-[#0F1D40] text-white p-4 sm:p-6 tactile-card">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-3">
           <div>
-            <p className="text-xs text-amber-300 font-medium">
-              01. állomás · Játékpénz keret: 3 000 Ft · Auchan Partnerfeladat
+            <p className="text-[11px] sm:text-xs text-amber-300 font-medium">
+              01. állomás · Keret: 3 000 Ft · Auchan Partnerfeladat
             </p>
-            <h2 className="mt-0.5 text-xl sm:text-2xl font-bold">
+            <h2 className="mt-0.5 text-lg sm:text-2xl font-bold">
               Válogass a polcról 3 000 Ft-ból!
             </h2>
           </div>
           <div className="flex items-baseline gap-4 sm:text-right shrink-0">
             <div>
               <span className="block text-[11px] text-slate-300">Elköltve</span>
-              <span className="font-mono tabular-nums text-xl font-bold text-white">
+              <span className="font-mono tabular-nums text-lg sm:text-xl font-bold text-white">
                 {formatFt(totalSpent)}
               </span>
             </div>
@@ -244,7 +244,7 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
             <div>
               <span className="block text-[11px] text-slate-300">Maradék</span>
               <span
-                className={`font-mono tabular-nums text-xl font-bold ${
+                className={`font-mono tabular-nums text-lg sm:text-xl font-bold ${
                   remaining < 350 ? 'text-rose-300' : 'text-amber-300'
                 }`}
               >
@@ -255,7 +255,7 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
         </div>
 
         {/* Budget meter */}
-        <div className="mt-4 h-3 w-full rounded-full bg-white/15 overflow-hidden">
+        <div className="mt-3 h-2.5 w-full rounded-full bg-white/15 overflow-hidden">
           <div
             className={`h-full transition-all duration-200 rounded-full ${
               budgetPercent > 90 ? 'bg-[#F43F5E]' : 'bg-amber-400'
@@ -265,15 +265,15 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
         </div>
 
         {/* Shopping List checklist */}
-        <div className="mt-4 pt-3.5 border-t border-white/15">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm">
-            <span className="font-bold text-amber-300">Bevásárlólista:</span>
+        <div className="mt-3 pt-3 border-t border-white/15">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs sm:text-sm">
+            <span className="font-bold text-amber-300">Lista:</span>
             {requiredProducts.map((req) => {
               const checked = selectedIds.includes(req.id);
               return (
                 <span
                   key={req.id}
-                  className={`inline-flex items-center gap-1.5 font-medium ${
+                  className={`inline-flex items-center gap-1 font-medium ${
                     checked ? 'text-amber-300 line-through opacity-85' : 'text-white'
                   }`}
                 >
@@ -285,15 +285,12 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
               );
             })}
           </div>
-          <p className="mt-1.5 text-xs text-slate-300">
-            Tipp: A listán túl pakolj be minél több hasznos terméket úgy, hogy ne lépd túl a 3 000 Ft-ot!
-          </p>
         </div>
 
         {warning && (
           <div
             role="alert"
-            className="mt-3.5 flex items-center gap-2 rounded-2xl bg-rose-500/20 border border-rose-400/50 px-3.5 py-2.5 text-xs sm:text-sm text-rose-100"
+            className="mt-3 flex items-center gap-2 rounded-xl bg-rose-500/20 border border-rose-400/50 px-3 py-2 text-xs sm:text-sm text-rose-100"
           >
             <AlertTriangle className="w-4 h-4 shrink-0 text-rose-300" />
             <span>{warning}</span>
@@ -302,7 +299,7 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
       </div>
 
       {/* Product shelf grid with supermarket yellow price stickers */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         {SHOP_PRODUCTS.map((product) => {
           const isSelected = selectedIds.includes(product.id);
           const cantAfford = !isSelected && totalSpent + product.price > SHOPPING_BUDGET;
@@ -311,17 +308,17 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
               key={product.id}
               type="button"
               onClick={() => toggleProduct(product)}
-              className={`group relative flex flex-col justify-between rounded-2xl border-2 p-3.5 text-left transition-all active:scale-[0.98] min-h-[164px] ${
+              className={`group relative flex flex-col justify-between rounded-2xl border-2 p-3 sm:p-3.5 text-left transition-all active:scale-[0.98] min-h-[146px] sm:min-h-[164px] ${
                 isSelected
-                  ? 'border-[#0F1D40] bg-[#EEF2FF]/60 shadow-[0_3px_0_0_#0F1D40]'
+                  ? 'border-[#0F1D40] bg-[#EEF2FF]/70 shadow-[0_3px_0_0_#0F1D40]'
                   : cantAfford
                   ? 'border-slate-200 bg-slate-100/70 opacity-60'
                   : 'border-slate-200 bg-white hover:border-[#0F1D40]/50 tactile-card'
               }`}
             >
-              <div className="flex items-start justify-between gap-2 w-full">
+              <div className="flex items-start justify-between gap-1.5 w-full">
                 <span className="text-[11px] font-semibold text-slate-500 truncate">
-                  {product.onList ? 'Listás cikk' : product.category}
+                  {product.onList ? 'Listás' : product.category}
                 </span>
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-xl transition-colors ${
@@ -334,16 +331,19 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
                 </span>
               </div>
 
-              <div className="my-2 flex justify-center">
-                <ProductArtwork art={product.art} className="w-14 h-14" />
+              <div className="my-1.5 flex justify-center">
+                <ProductArtwork art={product.art} className="w-12 h-12 sm:w-14 sm:h-14" />
               </div>
 
               <div className="w-full">
-                <p className="text-sm font-bold text-[#0B1220] leading-tight">{product.name}</p>
-                <div className="mt-2 flex items-center justify-between gap-1">
-                  <span className="text-[11px] text-slate-500">{product.unit}</span>
-                  {/* Iconic high-contrast supermarket yellow price sticker */}
-                  <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-[#0B1220] bg-[#FDE047] px-2 py-0.5 rounded-md">
+                <p className="text-xs sm:text-sm font-bold text-[#0B1220] leading-tight">
+                  {product.name}
+                </p>
+                <div className="mt-1.5 flex items-center justify-between gap-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-500 truncate">
+                    {product.unit}
+                  </span>
+                  <span className="font-mono tabular-nums text-xs sm:text-sm font-bold text-[#0B1220] bg-[#FDE047] px-1.5 sm:px-2 py-0.5 rounded-md shrink-0">
                     {formatFt(product.price)}
                   </span>
                 </div>
@@ -353,28 +353,38 @@ export const ShoppingChallenge: React.FC<ShoppingChallengeProps> = ({ onComplete
         })}
       </div>
 
-      {/* Bottom Checkout Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-3xl bg-white border border-slate-200 p-4 tactile-card">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0F1D40] text-amber-300 shrink-0">
-            <ShoppingBasket className="w-5 h-5" />
+      {/* Sticky Thumb-Zone Mobile Checkout Bar (static card on tablet/desktop) */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200 px-4 py-3 pb-safe sm:static sm:z-auto sm:rounded-3xl sm:border sm:p-4 sm:tactile-card">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="hidden sm:flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0F1D40] text-amber-300 shrink-0">
+              <ShoppingBasket className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-[#0B1220] truncate">
+                <span className="font-mono tabular-nums">{selectedIds.length} db</span> ·{' '}
+                <span className="font-mono tabular-nums">{formatFt(totalSpent)}</span>
+              </p>
+              <p className="text-[11px] sm:text-xs text-slate-500 truncate">
+                Maradt:{' '}
+                <span
+                  className={`font-mono tabular-nums font-bold ${
+                    remaining < 350 ? 'text-rose-600' : 'text-[#0F1D40]'
+                  }`}
+                >
+                  {formatFt(remaining)}
+                </span>
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-bold text-[#0B1220]">
-              Kosárban: <span className="font-mono tabular-nums">{selectedIds.length} db</span> termék
-            </p>
-            <p className="text-xs text-slate-500">
-              Összesen {formatFt(totalSpent)} · Még {formatFt(remaining)} költhető
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={handleCheckout}
+            className="tactile-btn min-h-[48px] rounded-2xl bg-[#E11D48] px-5 sm:px-6 py-2.5 text-sm font-bold text-white hover:bg-[#BE123C] transition-all whitespace-nowrap shrink-0"
+          >
+            Fizetés
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleCheckout}
-          className="tactile-btn min-h-[50px] rounded-2xl bg-[#E11D48] px-6 py-3 text-sm font-bold text-white hover:bg-[#BE123C] transition-all whitespace-nowrap shrink-0"
-        >
-          Fizetés a kasszánál
-        </button>
       </div>
     </div>
   );
