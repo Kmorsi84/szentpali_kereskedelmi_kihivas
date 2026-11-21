@@ -1,0 +1,6 @@
+{
+  "name": "Szentpáli Kis Kereskedő Kihívás",
+  "description": "Mérj, csomagolj és számolj! Interaktív pályaválasztási játék a Miskolci SZC Szentpáli István Kereskedelmi és Vendéglátó Technikum Kereskedelmi értékesítő szakjának bemutatására.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
