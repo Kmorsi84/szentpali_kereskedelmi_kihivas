@@ -41,6 +41,7 @@ import {
   fetchExpoLeaderboardFromSupabase,
   isSupabaseConfigured,
   saveExpoResultToSupabase,
+  syncLocalEntriesToSupabase,
 } from './lib/supabase';
 
 const STORAGE_KEYS = {
@@ -126,6 +127,48 @@ export default function App() {
     setIsLoadingLeaderboard(false);
   };
 
+  // Auto-sync any locally cached results (e.g. from offline play or prior local-only session) to Supabase on load
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const runInitialSync = async () => {
+      const localPlayer = safeReadJson<PlayerProfile | null>(STORAGE_KEYS.player, null);
+      const localResults = safeReadJson<Partial<Record<ChallengeId, ChallengeResult>>>(
+        STORAGE_KEYS.results,
+        {}
+      );
+      const localEntries = safeReadJson<LeaderboardEntry[]>(STORAGE_KEYS.leaderboard, []);
+
+      if (localPlayer) {
+        const localCompleted = CHALLENGES.filter((c) => localResults[c.id]?.completed).length;
+        const localScore = CHALLENGES.reduce(
+          (acc, c) => acc + (localResults[c.id]?.score ?? 0),
+          0
+        );
+        await saveExpoResultToSupabase(
+          {
+            id: localPlayer.id,
+            name: localPlayer.name,
+            className: localPlayer.className,
+            school: localPlayer.school,
+            totalScore: localScore,
+            completedCount: localCompleted,
+            updatedAt: new Date().toISOString(),
+          },
+          localResults
+        );
+      }
+
+      if (localEntries.length > 0) {
+        await syncLocalEntriesToSupabase(localEntries);
+      }
+
+      void refreshCloudLeaderboard();
+    };
+
+    void runInitialSync();
+  }, []);
+
   useEffect(() => {
     if (screen === 'leaderboard' && isSupabaseConfigured) {
       void refreshCloudLeaderboard();
@@ -183,6 +226,22 @@ export default function App() {
     setFormError(null);
     setScreen('hub');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const initialEntry: LeaderboardEntry = {
+      id: newPlayer.id,
+      name: newPlayer.name,
+      className: newPlayer.className,
+      school: newPlayer.school,
+      totalScore: 0,
+      completedCount: 0,
+      updatedAt: newPlayer.startedAt,
+    };
+
+    setLeaderboard((prev) => [initialEntry, ...prev.filter((item) => item.id !== newPlayer.id)]);
+
+    if (isSupabaseConfigured) {
+      void saveExpoResultToSupabase(initialEntry, {});
+    }
   };
 
   const handleNewPlayer = () => {

@@ -1,11 +1,16 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { ChallengeId, ChallengeResult, LeaderboardEntry } from '../types';
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim() ?? '';
+declare const __APP_SUPABASE_URL__: string | undefined;
+declare const __APP_SUPABASE_KEY__: string | undefined;
+
+const supabaseUrl =
+  (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim() ||
+  (typeof __APP_SUPABASE_URL__ === 'string' ? __APP_SUPABASE_URL__.trim() : '');
 const supabaseKey =
   (import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined)?.trim() ||
   (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim() ||
-  '';
+  (typeof __APP_SUPABASE_KEY__ === 'string' ? __APP_SUPABASE_KEY__.trim() : '');
 
 function isValidHttpsUrl(value: string): boolean {
   try {
@@ -82,6 +87,35 @@ export async function saveExpoResultToSupabase(
   }
 }
 
+export async function syncLocalEntriesToSupabase(
+  entries: LeaderboardEntry[]
+): Promise<boolean> {
+  if (!supabase || entries.length === 0) return false;
+
+  const rows = entries
+    .map((entry) => ({
+      id: clampText(entry.id, 64),
+      name: clampText(entry.name, 80),
+      class_name: clampText(entry.className, 30),
+      school: clampText(entry.school, 120),
+      total_score: Math.max(0, Math.min(500, Math.round(entry.totalScore))),
+      completed_count: Math.max(0, Math.min(5, Math.round(entry.completedCount))),
+      updated_at: entry.updatedAt || new Date().toISOString(),
+    }))
+    .filter((row) => row.id && row.name && row.class_name && row.school);
+
+  if (rows.length === 0) return false;
+
+  try {
+    const { error } = await supabase
+      .from('expo_results')
+      .upsert(rows, { onConflict: 'id', ignoreDuplicates: true });
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 export async function fetchExpoLeaderboardFromSupabase(): Promise<LeaderboardEntry[] | null> {
   if (!supabase) return null;
 
@@ -91,7 +125,7 @@ export async function fetchExpoLeaderboardFromSupabase(): Promise<LeaderboardEnt
       .select('id, name, class_name, school, total_score, completed_count, updated_at')
       .order('total_score', { ascending: false })
       .order('completed_count', { ascending: false })
-      .limit(100);
+      .limit(1000);
 
     if (error || !Array.isArray(data)) {
       return null;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Crown, RefreshCw, Trophy, Trash2, UserPlus } from 'lucide-react';
+import { Crown, Download, RefreshCw, Trophy, Trash2, UserPlus } from 'lucide-react';
 import type { LeaderboardEntry } from '../types';
 import { CHALLENGES } from '../data/gameData';
 
@@ -31,6 +31,33 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
   const topThree = sorted.slice(0, 3);
   const restEntries = sorted.slice(3);
+
+  const handleExportCsv = () => {
+    if (sorted.length === 0) return;
+    const escapeCell = (val: string | number) => {
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+    const header = ['Helyezés', 'Név', 'Osztály', 'Iskola', 'Összpontszám', 'Teljesített állomások', 'Időpont'];
+    const rows = sorted.map((entry, index) => [
+      index + 1,
+      entry.name,
+      entry.className,
+      entry.school,
+      entry.totalScore,
+      `${entry.completedCount}/${CHALLENGES.length}`,
+      new Date(entry.updatedAt).toLocaleString('hu-HU'),
+    ]);
+    const csvContent =
+      '\uFEFF' + [header, ...rows].map((row) => row.map(escapeCell).join(';')).join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `szentpali-kihivas-eredmenyek-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="space-y-5">
@@ -193,40 +220,50 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
             </div>
           )}
 
-          {/* Footer info & local-only clear */}
-          <div className="flex items-center justify-between gap-3 px-2 text-xs text-slate-500">
+          {/* Footer info, CSV export & local-only clear */}
+          <div className="flex flex-wrap items-center justify-between gap-3 px-2 text-xs text-slate-500">
             <span>Összesen {sorted.length} kiállítási résztvevő</span>
-            {!isSharedCloud &&
-              (!confirmClear ? (
-                <button
-                  type="button"
-                  onClick={() => setConfirmClear(true)}
-                  className="min-h-[36px] font-semibold text-slate-500 hover:text-rose-700 inline-flex items-center gap-1.5"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Lista törlése
-                </button>
-              ) : (
-                <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className="min-h-[38px] rounded-xl border border-slate-200 bg-white px-3 py-1.5 font-bold text-[#0F1D40] hover:border-[#0F1D40] transition-colors inline-flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Excel (CSV) letöltés
+              </button>
+              {!isSharedCloud &&
+                (!confirmClear ? (
                   <button
                     type="button"
-                    onClick={() => setConfirmClear(false)}
-                    className="min-h-[36px] rounded-lg px-2.5 font-semibold text-slate-600 hover:bg-slate-200"
+                    onClick={() => setConfirmClear(true)}
+                    className="min-h-[38px] font-semibold text-slate-500 hover:text-rose-700 inline-flex items-center gap-1.5 px-2"
                   >
-                    Mégse
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Lista törlése
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onClearEntries();
-                      setConfirmClear(false);
-                    }}
-                    className="min-h-[36px] rounded-lg bg-rose-600 px-3 font-semibold text-white hover:bg-rose-700"
-                  >
-                    Törlés megerősítése
-                  </button>
-                </div>
-              ))}
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setConfirmClear(false)}
+                      className="min-h-[38px] rounded-lg px-2.5 font-semibold text-slate-600 hover:bg-slate-200"
+                    >
+                      Mégse
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClearEntries();
+                        setConfirmClear(false);
+                      }}
+                      className="min-h-[38px] rounded-lg bg-rose-600 px-3 font-semibold text-white hover:bg-rose-700"
+                    >
+                      Törlés megerősítése
+                    </button>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       )}
